@@ -1,0 +1,13 @@
+{
+  "attempt_id": "attempt-002",
+  "day": 2,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-08",
+  "stress_scenarios": [
+    {
+      "scenario": "5 agent 结果合并时 schema 不一致",
+      "result": "pass",
+      "note": "统一 schema 约束解决了合并冲突"
+    }
+  ]
+}

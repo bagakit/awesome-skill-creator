@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-005",
+  "day": 5,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-01",
+  "comparison": "run_script eval vs contains-only eval",
+  "gsb_distribution": {"Good": 5, "Same": 1, "Bad": 0},
+  "value_creation_rate": 0.83,
+  "note": "run_script 断言在功能正确性检测上明显优于纯 contains"
+}

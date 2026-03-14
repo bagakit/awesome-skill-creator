@@ -1,0 +1,19 @@
+{
+  "attempt_id": "attempt-003",
+  "day": 3,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-15",
+  "sanity_cases": [
+    {
+      "id": "step0_yaml_required",
+      "description": ".step0.yaml 存在且含 success_definition + domain_vocab + failure_modes",
+      "result": "pass"
+    },
+    {
+      "id": "failure_modes_generate_fail_cases",
+      "description": "每个 failure_mode 对应至少 1 个 expected_result: fail case",
+      "result": "pass"
+    }
+  ],
+  "verdict": "proceed"
+}

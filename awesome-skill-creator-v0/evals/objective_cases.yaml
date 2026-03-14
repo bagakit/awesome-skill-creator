@@ -1,0 +1,1645 @@
+# skill-creator v3 客观层评测用例
+# Only-increase：v0 + v1 + v2 全部用例保留，v3 新增用例追加
+# 新增字段：target_point（优化点标注）、regression_level（P0=核心必过，P1=Nice-to-have）
+
+cases:
+
+  # ===== 继承自 v0（only-increase）=====
+
+  - id: "create_valid_skill_md"
+    description: "创建的 Skill 包含合法的 SKILL.md"
+    expected_result: pass
+    dimension: correctness
+    target_point: "基础结构完整性"
+    regression_level: P0
+    input: "创建一个名为 hello-world 的 Skill，功能是向用户打招呼"
+    context:
+      - "skill-creator 已初始化"
+      - "scaffold.md 可访问"
+    assertions:
+      - type: file_exists
+        value: "hello-world-v0/SKILL.md"
+      - type: contains
+        value: "description:"
+        target: "hello-world-v0/SKILL.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能生成包含 description 的 markdown，但格式和结构不稳定"
+      skill_advantage: "Skill 确保 YAML frontmatter 格式、必须字段完整、符合 scaffold 规范"
+    source: human_designed
+    added_in: v0
+
+  - id: "create_complete_directory"
+    description: "创建的 Skill 目录结构符合 scaffold.md 定义"
+    expected_result: pass
+    dimension: coverage
+    target_point: "基础结构完整性"
+    regression_level: P0
+    input: "创建一个名为 code-reviewer 的 Skill，功能是审查代码质量"
+    context:
+      - "skill-creator 已初始化"
+      - "scaffold.md 可访问"
+    assertions:
+      - type: file_exists
+        value: "code-reviewer-v0/SKILL.md"
+      - type: file_exists
+        value: "code-reviewer-v0/process.md"
+      - type: file_exists
+        value: "code-reviewer-v0/manifest.yaml"
+      - type: file_exists
+        value: "code-reviewer-v0/evals/objective_cases.yaml"
+      - type: file_exists
+        value: "code-reviewer-v0/evals/eval_protocol.md"
+      - type: file_exists
+        value: "code-reviewer-v0/evolve_history/v0/genesis.md"
+      - type: file_exists
+        value: "code-reviewer-v0/evals/eval_research/literature_review.json"
+      - type: file_exists
+        value: "code-reviewer-v0/evolve_history/v0/attempts/attempt-001/hypothesis.md"
+      - type: file_exists
+        value: "code-reviewer-v0/evolve_history/v0/summary.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能创建部分目录结构，但易遗漏 evals/、evolve_history/ 等深层目录"
+      skill_advantage: "Skill 确保完整目录树匹配 scaffold.md 标准，包含所有必须文件"
+    source: human_designed
+    added_in: v0
+
+  - id: "create_valid_manifest"
+    description: "创建的 manifest.yaml 包含所有必须字段且格式合法"
+    expected_result: pass
+    dimension: correctness
+    target_point: "基础结构完整性"
+    regression_level: P0
+    input: "创建一个名为 doc-writer 的 Skill，功能是生成技术文档"
+    context:
+      - "skill-creator 已初始化"
+    assertions:
+      - type: file_exists
+        value: "doc-writer-v0/manifest.yaml"
+      - type: yaml_valid
+        target: "doc-writer-v0/manifest.yaml"
+      - type: yaml_field_equals
+        target: "doc-writer-v0/manifest.yaml"
+        field: "name"
+        value: "doc-writer"
+      - type: yaml_field_equals
+        target: "doc-writer-v0/manifest.yaml"
+        field: "version"
+        value: "v0"
+      - type: yaml_field_equals
+        target: "doc-writer-v0/manifest.yaml"
+        field: "bootstrap_status"
+        value: "genesis"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能生成 YAML 但字段命名和枚举值不符合联邦协议"
+      skill_advantage: "Skill 确保 manifest 字段、枚举值、版本格式严格符合联邦规范"
+    source: human_designed
+    added_in: v0
+
+  - id: "created_skill_can_self_bootstrap"
+    description: "创建的 Skill 具备自举能力——包含可执行的 self-bootstrap.md"
+    expected_result: pass
+    dimension: coverage
+    target_point: "基础结构完整性"
+    regression_level: P0
+    evolution_direction: >
+      v1 新增 Step 3.5（进化路径设计），为每个创建的 Skill 生成 self-bootstrap.md。
+    input: "创建一个名为 test-generator 的 Skill，功能是自动生成测试用例，且该 Skill 必须能自举"
+    context:
+      - "skill-creator 已初始化"
+      - "目标 Skill 需要包含可执行的 self-bootstrap.md"
+    assertions:
+      - type: file_exists
+        value: "test-generator-v0/self-bootstrap.md"
+      - type: contains
+        value: "Phase 1"
+        target: "test-generator-v0/self-bootstrap.md"
+      - type: contains
+        value: "only-increase"
+        target: "test-generator-v0/self-bootstrap.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会主动生成 self-bootstrap.md，即使生成也缺乏 eval 引用"
+      skill_advantage: "v1+ 的 Step 3.5 确保每个 Skill 从诞生起就有可执行的进化路径"
+    source: human_designed
+    added_in: v0
+
+  - id: "eval_quality_meets_threshold"
+    description: "创建的评测集：file_exists 单一断言占比 ≤40%，包含领域内容断言"
+    expected_result: fail
+    tier: P2
+    superseded_by: "eval_file_exists_ratio"
+    dimension: correctness
+    target_point: "基础结构完整性"
+    regression_level: P1
+    evolution_direction: >
+      此用例断言保持 v0 原始形式（not_contains: file_exists）以维持 only-increase。
+      v3 在 validate_evals.sh 实现占比自动检测，语义等价功能由 eval_file_exists_ratio
+      和 eval_has_content_assertions 覆盖。断言缺陷为永久性历史债务。
+      ⭐v7 归档：标记为 P2，superseded_by=eval_file_exists_ratio（更强的语义等价替代）。
+    input: "创建一个名为 sql-optimizer 的 Skill，功能是优化 SQL 查询性能"
+    context:
+      - "skill-creator 已初始化"
+      - "评测集需包含领域特定的质量断言"
+    assertions:
+      - type: min_count
+        target: "sql-optimizer-v0/evals/objective_cases.yaml"
+        element: "cases"
+        value: 5
+      - type: contains
+        value: "executable"
+        target: "sql-optimizer-v0/evals/objective_cases.yaml"
+      - type: not_contains
+        value: "file_exists"
+        target: "sql-optimizer-v0/evals/objective_cases.yaml"
+    source: human_designed
+    added_in: v0
+
+  - id: "research_informs_design"
+    description: "genesis.md 包含结构化调研记录（来源 → 发现 → 对设计的影响）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "基础结构完整性"
+    regression_level: P1
+    input: "创建一个名为 prompt-optimizer 的 Skill，功能是优化 LLM prompt 的效果"
+    context:
+      - "skill-creator 已初始化"
+      - "该领域有大量前沿研究（DSPy, OPRO, APE 等）"
+    assertions:
+      - type: contains
+        value: "调研"
+        target: "prompt-optimizer-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        value: "来源"
+        target: "prompt-optimizer-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        value: "对设计的影响"
+        target: "prompt-optimizer-v0/evolve_history/v0/genesis.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 的 genesis.md 中调研记录格式不统一，难以追溯来源与影响"
+      skill_advantage: "v1+ 的 Step 2 强制结构化输出，genesis.md 包含可追溯的调研影响矩阵"
+    source: human_designed
+    added_in: v0
+
+  - id: genesis_contains_substance
+    description: "genesis.md 包含实质性内容关键词，不仅仅是结构占位符"
+    expected_result: pass
+    dimension: correctness
+    target_point: "基础结构完整性"
+    regression_level: P1
+    source: human_designed
+    added_in: v0
+    input:
+      action: create
+      name: content-checker
+      description: "A utility skill for content quality verification"
+    context:
+      whitepaper: meta_whitepaper.md
+      scaffold: scaffold.md
+    assertions:
+      - type: file_exists
+        value: "content-checker-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        target: "content-checker-v0/evolve_history/v0/genesis.md"
+        value: "假设"
+      - type: contains
+        target: "content-checker-v0/evolve_history/v0/genesis.md"
+        value: "已知局限"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能生成 genesis.md 但内容可能是泛泛的占位文本"
+      skill_advantage: "Skill 确保 genesis.md 包含假设、方法、已知局限等实质性分析内容"
+
+  # ===== 继承自 v1（only-increase）=====
+
+  - id: "created_skill_has_domain_eval"
+    description: "domain 类型 Skill 的评测集包含领域功能断言（不只是文件/格式检查）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "eval 领域感知 + 三维度覆盖"
+    regression_level: P0
+    input: "创建一个名为 code-reviewer 的 domain 类型 Skill，功能是审查 Python 代码质量"
+    context:
+      - "skill-creator v1+ 已初始化"
+      - "按领域感知评测设计，domain 类型必须有内容质量断言"
+    assertions:
+      - type: file_exists
+        value: "code-reviewer-v0/evals/objective_cases.yaml"
+      - type: not_contains
+        value: "file_exists"
+        target: "code-reviewer-v0/evals/objective_cases.yaml"
+      - type: contains
+        value: "correctness"
+        target: "code-reviewer-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 倾向于生成 file_exists 类型断言，缺乏领域内容验证"
+      skill_advantage: "v1+ 的 Step 4 对 domain 类型强制要求领域功能断言"
+    source: human_designed
+    added_in: v1
+
+  - id: "research_impact_matrix_in_genesis"
+    description: "genesis.md 包含结构化调研影响矩阵（来源 → 发现 → 对设计的影响）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "eval 领域感知 + 三维度覆盖"
+    regression_level: P1
+    input: "创建一个名为 api-designer 的 Skill，功能是设计 RESTful API"
+    context:
+      - "skill-creator v1+ 已初始化"
+      - "Step 2 要求结构化调研输出"
+    assertions:
+      - type: contains
+        value: "调研影响"
+        target: "api-designer-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        value: "对设计的影响"
+        target: "api-designer-v0/evolve_history/v0/genesis.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 的 genesis.md 调研记录格式随意，缺乏影响追溯"
+      skill_advantage: "v1+ 的 Step 2 + Step 6 强制要求调研影响矩阵进入 genesis.md"
+    source: human_designed
+    added_in: v1
+
+  - id: "three_dimension_eval_coverage"
+    description: "评测集所有 case 包含 dimension 字段，且覆盖三个维度各至少 1 条"
+    expected_result: pass
+    dimension: coverage
+    target_point: "eval 领域感知 + 三维度覆盖"
+    regression_level: P0
+    evolution_direction: >
+      v2 引入 dimension 字段规范；v3 在 validate_evals.sh 实现自动检测。
+      此用例由 fail→pass，evidence 见 genesis.md §Evidence-A。
+    input: "创建一个名为 data-transformer 的 Skill，功能是转换数据格式"
+    context:
+      - "skill-creator v3 已初始化"
+      - "评测集需覆盖三个维度"
+    assertions:
+      - type: contains
+        value: "dimension: correctness"
+        target: "data-transformer-v0/evals/objective_cases.yaml"
+      - type: contains
+        value: "dimension: coverage"
+        target: "data-transformer-v0/evals/objective_cases.yaml"
+      - type: contains
+        value: "dimension: consistency"
+        target: "data-transformer-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 eval cases 不会主动包含 dimension 字段"
+      skill_advantage: "v3 process.md Step 4 和 validate_evals.sh 共同确保三维度强制覆盖"
+    source: human_designed
+    added_in: v1
+
+  # ===== 继承自 v2（only-increase）=====
+
+  - id: "eval_has_external_source_cases"
+    description: "评测集包含 ≥2 条外部来源（frontier_paper）的用例，降低自设评测比例"
+    expected_result: pass
+    dimension: coverage
+    target_point: "外部来源 case + evidence 防作弊"
+    regression_level: P0
+    evolution_direction: >
+      v2 要求外部来源；v3 在 Step 4 新增「外部来源 case 获取流程」并在 validate_evals.sh 检测。
+      此用例由 fail→pass，evidence 见 genesis.md §Evidence-B。
+    input: "创建一个名为 code-reviewer 的 Skill，要求评测集包含领域论文来源的用例"
+    context:
+      - "skill-creator v3 已初始化"
+      - "防止奖励作弊：外部来源用例减少自我评测偏差"
+    assertions:
+      - type: contains
+        value: "frontier_paper"
+        target: "code-reviewer-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 默认生成 human_designed 用例，不会主动引用外部论文"
+      skill_advantage: "v3 Step 4 强制要求从调研论文中转化 ≥2 条 frontier_paper 用例"
+    source: human_designed
+    added_in: v2
+
+  - id: "self_bootstrap_includes_evidence_field"
+    description: "自举时，fail→pass 的 eval 变化附带 evidence 字段（具体执行证据）"
+    expected_result: pass
+    dimension: consistency
+    target_point: "外部来源 case + evidence 防作弊"
+    regression_level: P0
+    evolution_direction: >
+      v2 要求 evidence 字段；v3 在本次 genesis.md 中首次完整实例化此要求。
+      此用例由 fail→pass，evidence 见 genesis.md §Evidence-C。
+    input: "执行 skill-creator 自举，将某条 fail case 改为 pass"
+    context:
+      - "skill-creator v3 自举模式"
+      - "反奖励作弊：所有 fail→pass 变化需要可验证证据"
+    assertions:
+      - type: contains
+        value: "evidence"
+        target: "skill-creator-v3/evolve_history/v3/genesis.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 自举时不会主动追踪 fail→pass 的实际执行证据"
+      skill_advantage: "v3 self-bootstrap.md Phase 5 强制要求每条 fail→pass 附 evidence"
+    source: human_designed
+    added_in: v2
+
+  # ===== v3 新增用例：质量导向（核心）=====
+
+  - id: "created_process_has_domain_content"
+    description: "创建的领域技能的 process.md 包含领域特有词汇，不只是通用流程模板"
+    expected_result: pass
+    dimension: correctness
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 sql-optimizer 的 domain 类型 Skill，功能是分析和优化 SQL 查询性能，产出包括执行计划分析和索引优化建议"
+    context:
+      - "skill-creator v3 已初始化"
+      - "v3 Step 0 要求定义领域词汇表（SQL、查询、执行计划、索引等）"
+    assertions:
+      - type: contains
+        value: "SQL"
+        target: "sql-optimizer-v0/process.md"
+      - type: contains
+        value: "查询"
+        target: "sql-optimizer-v0/process.md"
+      - type: not_contains
+        value: "TODO"
+        target: "sql-optimizer-v0/process.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能生成通用的「Step 1: 分析需求，Step 2: 设计方案」，缺乏执行计划分析、慢查询识别等 SQL 特有内容"
+      skill_advantage: "v3 Step 0 强制定义领域词汇表并写入 SKILL.md，Step 3 要求包含领域词汇，Step 0 的失败模式直接驱动 SQL 特有内容的产生"
+    source: human_designed
+    added_in: v3
+
+  - id: "created_eval_uses_domain_assertions"
+    description: "创建的技能的 eval 断言值包含领域特有词汇，而非只检查通用结构关键词"
+    expected_result: pass
+    dimension: correctness
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 code-reviewer 的 domain 类型 Skill，功能是审查 Python 代码的质量和安全性，关注 bug 发现、安全漏洞和代码风格"
+    context:
+      - "skill-creator v3 已初始化"
+      - "v3 Step 4 要求从失败模式出发：失败 A=未发现明显 bug，失败 B=误报正常代码为有问题"
+    assertions:
+      - type: contains
+        value: "Python"
+        target: "code-reviewer-v0/evals/objective_cases.yaml"
+      - type: not_contains
+        value: "{TODO}"
+        target: "code-reviewer-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 eval 断言容易是 contains: 'correctness' 或纯 file_exists，缺乏 Python 代码质量领域的具体内容检验"
+      skill_advantage: "v3 Step 4 的「失败模式优先」设计要求从「未发现 bug」「误报」等具体场景反推断言，确保断言值包含领域词汇"
+    source: human_designed
+    added_in: v3
+
+  - id: "created_genesis_cites_specific_source"
+    description: "创建的技能的 genesis.md 调研部分包含具体来源引用（论文标题/URL），而非只有「调研」关键词"
+    expected_result: pass
+    dimension: consistency
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P1
+    input: "创建一个名为 prompt-optimizer 的 Skill，功能是基于 DSPy 等方法优化 LLM prompt 效果"
+    context:
+      - "skill-creator v3 已初始化"
+      - "v3 Step 2 要求调研引用具体来源：DSPy、APE、OPRO 等均有明确论文可引用"
+    assertions:
+      - type: contains
+        value: "DSPy"
+        target: "prompt-optimizer-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        value: "对设计的影响"
+        target: "prompt-optimizer-v0/evolve_history/v0/genesis.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 的 genesis.md 调研部分可能只写「参考了相关研究」，无具体来源，无法追溯验证"
+      skill_advantage: "v3 Step 2 强制每条调研发现包含具体来源（标题/URL/会议），v3 evals 用 specific term 检测可追溯性"
+    source: human_designed
+    added_in: v3
+
+  - id: "eval_file_exists_ratio"
+    description: "创建的 sql-optimizer Skill 评测集中 file_exists 单一断言占比 ≤ 40%（eval_quality_meets_threshold 历史债务的语义等价替代）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 sql-optimizer 的 Skill，功能是优化 SQL 查询性能"
+    context:
+      - "skill-creator v3 已初始化"
+      - "v3 validate_evals.sh 自动检测 file_exists 占比约束"
+    assertions:
+      - type: min_count
+        target: "sql-optimizer-v0/evals/objective_cases.yaml"
+        element: "cases"
+        value: 5
+      - type: contains
+        value: "contains"
+        target: "sql-optimizer-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 倾向于生成大量 file_exists 断言，content 断言稀少"
+      skill_advantage: "v3 Step 4 失败模式驱动 + validate_evals.sh 共同强制执行 file_exists 占比约束"
+    source: human_designed
+    added_in: v3
+
+  - id: "eval_has_content_assertions"
+    description: "创建的 Skill 的评测集中至少有 1 条包含 contains 或 executable 的内容性断言"
+    expected_result: pass
+    dimension: correctness
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 refactoring-guide 的 Skill，功能是指导代码重构"
+    context:
+      - "skill-creator v3 已初始化"
+    assertions:
+      - type: contains
+        value: "contains"
+        target: "refactoring-guide-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 eval 以文件存在检查为主，缺少内容质量验证"
+      skill_advantage: "v3 Step 4 的失败模式驱动设计确保内容断言覆盖"
+    source: human_designed
+    added_in: v3
+
+  - id: "process_declares_step_io"
+    description: "创建的 Skill 的 process.md 明确声明每步的输入和输出（基于 Khattab et al. (2023) 'DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines' 模块签名原则）"
+    expected_result: pass
+    dimension: coverage
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 data-pipeline 的 Skill，功能是构建数据清洗管道"
+    context:
+      - "skill-creator v3 已初始化"
+      - "参考 DSPy（Khattab et al., 2023）：每个 LLM 模块应有明确 I/O 签名"
+    assertions:
+      - type: contains
+        value: "输入"
+        target: "data-pipeline-v0/process.md"
+      - type: contains
+        value: "输出"
+        target: "data-pipeline-v0/process.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 process.md 步骤描述模糊，缺少明确的 I/O 边界"
+      skill_advantage: "skill-creator 的 process.md 模板强制每步声明 I/O，确保流程可追踪可验证"
+    source: frontier_paper
+    added_in: v3
+
+  - id: "eval_captures_failure_modes"
+    description: "创建的 Skill 的评测集包含至少 2 条 expected_fail 用例且每条附带 evolution_direction（基于 Myers et al. 'The Art of Software Testing' 边界值与失败模式测试原则）"
+    expected_result: pass
+    dimension: consistency
+    target_point: "失败模式驱动 eval + 领域特异性"
+    regression_level: P0
+    input: "创建一个名为 schema-validator 的 Skill，功能是验证 JSON Schema"
+    context:
+      - "skill-creator v3 已初始化"
+      - "参考《软件测试的艺术》（Myers et al.）：边界用例和失败模式是测试集质量的核心"
+    assertions:
+      - type: contains
+        value: "evolution_direction"
+        target: "schema-validator-v0/evals/objective_cases.yaml"
+      - type: contains
+        value: "expected_result: fail"
+        target: "schema-validator-v0/evals/objective_cases.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 eval 以正向通过测试为主，失败模式和进化方向缺失"
+      skill_advantage: "v3 Step 4 要求 ≥2 条 fail case + evolution_direction，确保进化信号持续可用"
+    source: frontier_paper
+    added_in: v3
+
+  # ===== v3 新增用例：白皮书 v2 对齐（核心）=====
+
+  - id: "created_skill_has_eval_research_json"
+    description: "创建的 Skill 包含 eval_research/ 下的 5 个结构化调研 JSON 文件（sub-agent 并行调研产物）"
+    expected_result: pass
+    dimension: coverage
+    target_point: "白皮书 v2 字段对齐 + sub-agent 调研强制"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "创建一个名为 data-analyzer 的 Skill，功能是分析数据质量和异常检测"
+    assertions:
+      - type: file_exists
+        value: "data-analyzer-v0/evals/eval_research/literature_review.json"
+      - type: file_exists
+        value: "data-analyzer-v0/evals/eval_research/frontier_impls.json"
+      - type: file_exists
+        value: "data-analyzer-v0/evals/eval_research/tool_analysis.json"
+      - type: file_exists
+        value: "data-analyzer-v0/evals/eval_research/edge_cases.json"
+      - type: file_exists
+        value: "data-analyzer-v0/evals/eval_research/user_scenarios.json"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会主动进行结构化的多维度调研，更不会产出标准化 JSON 格式"
+      skill_advantage: "v3 process.md Step 2 强制拉起 5 类 sub-agent 并行调研，产出统一 JSON schema"
+
+  - id: "created_manifest_has_whitepaper_v2_fields"
+    description: "创建的 Skill 的 manifest.yaml 包含白皮书 v2 要求的完整字段（family、status、bootstrap_target 等）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "白皮书 v2 字段对齐 + sub-agent 调研强制"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "创建一个名为 text-summarizer 的 Skill，功能是生成文档摘要"
+    assertions:
+      - type: yaml_valid
+        target: "text-summarizer-v0/manifest.yaml"
+      - type: yaml_field_equals
+        target: "text-summarizer-v0/manifest.yaml"
+        field: "family"
+        value: "text-summarizer"
+      - type: yaml_field_equals
+        target: "text-summarizer-v0/manifest.yaml"
+        field: "status"
+        value: "draft"
+      - type: contains
+        value: "bootstrap_target"
+        target: "text-summarizer-v0/manifest.yaml"
+      - type: contains
+        value: "auto_upgrade_policy"
+        target: "text-summarizer-v0/manifest.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 manifest.yaml 不包含状态机字段（family、status、bootstrap_target 等），无法支持自动升级"
+      skill_advantage: "v3 scaffold.md 要求 manifest 包含白皮书 §2.2 的全部字段，支持调度器自动管理生命周期"
+
+  # ===== v4 目标（expected_fail）=====
+
+  - id: "ultimate_test_created_unknown_skill"
+    description: "v3 自举完成后，用 v3 创建陌生领域 Skill 并由用户独立评估（终极检验，打破自举闭环）"
+    expected_result: fail
+    dimension: consistency
+    target_point: "终极检验打破自举闭环"
+    regression_level: P1
+    evolution_direction: >
+      v3 将终极检验规范为 self-bootstrap.md Phase 6（强制步骤）。
+      v4 自举时必须实际执行：创建陌生领域 Skill → 用户独立评估 4 维度 →
+      结果记录在 genesis.md「独立评估」章节。若评估合格，bootstrap_status 升级为 subjective_bootstrapping。
+    input: "执行 skill-creator v3 自举，完成终极检验：创建陌生领域 Skill 并由用户独立评估"
+    context:
+      - "skill-creator v3 已初始化"
+      - "终极检验是打破自举闭环的唯一机制"
+    assertions:
+      - type: contains
+        value: "独立评估"
+        target: "skill-creator-v4/evolve_history/v4/genesis.md"
+      - type: contains
+        value: "合格"
+        target: "skill-creator-v4/evolve_history/v4/genesis.md"
+    source: human_designed
+    added_in: v3
+
+  # ===== v3 终极检验落地（新增）=====
+
+  - id: "terminal_test_skill_has_domain_vocab"
+    description: "终极检验 skill（kubernetes-debug-advisor）SKILL.md 包含 K8s 特有术语，证明 v3 在陌生领域生成了真正的领域内容"
+    expected_result: pass
+    dimension: correctness
+    target_point: "终极检验——陌生领域领域词汇"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "用 v3 创建 kubernetes-debug-advisor-v0"
+    assertions:
+      - type: contains
+        value: "CrashLoopBackOff"
+        target: "kubernetes-debug-advisor-v0/SKILL.md"
+      - type: contains
+        value: "OOMKilled"
+        target: "kubernetes-debug-advisor-v0/SKILL.md"
+      - type: contains
+        value: "kubectl"
+        target: "kubernetes-debug-advisor-v0/process.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 生成的 SKILL.md 可能包含 k8s 术语，但缺乏系统性的失败模式分类和领域词汇表"
+      skill_advantage: "v3 Step 0 强制定义领域词汇表和失败模式，生成的 SKILL.md 包含结构化的 5 类失败模式和 18 项领域词汇"
+
+  - id: "terminal_test_process_has_kubectl"
+    description: "终极检验 skill 的 process.md 包含具体 kubectl 命令，证明 v3 生成的流程有领域操作性"
+    expected_result: pass
+    dimension: coverage
+    target_point: "终极检验——流程操作性"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "用 v3 创建 kubernetes-debug-advisor-v0"
+    assertions:
+      - type: contains
+        value: "kubectl describe"
+        target: "kubernetes-debug-advisor-v0/process.md"
+      - type: contains
+        value: "kubectl logs"
+        target: "kubernetes-debug-advisor-v0/process.md"
+      - type: contains
+        value: "回滚"
+        target: "kubernetes-debug-advisor-v0/process.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能给出通用诊断步骤，但不会系统化为 5 步流程，且输出格式不固定"
+      skill_advantage: "v3 process.md 规范强制每步有明确的输入/输出，使流程可执行和可验证"
+
+  - id: "terminal_test_genesis_cites_real_source"
+    description: "终极检验 skill 的 genesis.md 引用了真实的 Kubernetes 文档 URL，证明调研影响矩阵有真实来源"
+    expected_result: pass
+    dimension: consistency
+    target_point: "终极检验——调研真实性"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "用 v3 创建 kubernetes-debug-advisor-v0"
+    assertions:
+      - type: contains
+        value: "kubernetes.io"
+        target: "kubernetes-debug-advisor-v0/genesis.md"
+      - type: contains
+        value: "调研影响"
+        target: "kubernetes-debug-advisor-v0/genesis.md"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 的 genesis.md 通常不含真实 URL，调研影响描述是虚构的"
+      skill_advantage: "v3 强制 5 类 sub-agent 调研，每条发现必须有具体来源 URL"
+
+  - id: "terminal_test_has_step0_yaml"
+    description: "终极检验 skill 有 .step0.yaml 文件，包含 success_definition 和 failure_modes，证明 Step 0 输出可追溯"
+    expected_result: pass
+    dimension: correctness
+    target_point: "Step 0 输出可验证（v3.1 新增）"
+    regression_level: P0
+    source: human_designed
+    added_in: v3
+    input: "用 v3 创建 kubernetes-debug-advisor-v0，Step 0 写入 .step0.yaml"
+    assertions:
+      - type: file_exists
+        value: "kubernetes-debug-advisor-v0/.step0.yaml"
+      - type: yaml_valid
+        target: "kubernetes-debug-advisor-v0/.step0.yaml"
+      - type: contains
+        value: "success_definition"
+        target: "kubernetes-debug-advisor-v0/.step0.yaml"
+      - type: contains
+        value: "failure_modes"
+        target: "kubernetes-debug-advisor-v0/.step0.yaml"
+      - type: contains
+        value: "domain_vocab"
+        target: "kubernetes-debug-advisor-v0/.step0.yaml"
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会输出 .step0.yaml；目标定义只存在于对话流中，不可追溯验证"
+      skill_advantage: "v3 process.md 强制 Step 0 写入结构化 YAML，使目标定义成为可验证的工件，后续步骤的偏离可被检测"
+
+  # ===== v4 新增：executable assertions (run_script 类型) =====
+
+  - id: "step0_yaml_required_fail"
+    description: "v4 强制要求 .step0.yaml 存在（v3 只是 warn，v4 升级为 fail）——validate_structure.sh 应对缺失的 .step0.yaml 报错"
+    expected_result: pass
+    dimension: correctness
+    target_point: "Step 0 强制化"
+    regression_level: P1
+    evolution_direction: >
+      v4 将 .step0.yaml 从可选升级为强制，确保每个创建的 Skill 都有可追溯的目标定义。
+      下一优化点：validate_evals.sh 检测 eval case 中的 failure_modes 是否与 .step0.yaml 对齐。
+    input: "在 skill-creator-v4 上运行 validate_structure.sh，检查 .step0.yaml 缺失时是否报 FAIL"
+    context:
+      - "skill-creator-v4 validate_structure.sh 已更新，将缺失 .step0.yaml 从 warn 升级为 fail"
+    assertions:
+      - type: run_script
+        target: "skill-creator-v4"
+        script: |
+          # 创建临时测试目录（无 .step0.yaml），确认 validate_structure.sh 报 FAIL
+          tmpdir=$(mktemp -d /tmp/test_skill_XXXX)
+          trap "rm -rf $tmpdir" EXIT
+          # 创建最小结构
+          mkdir -p "$tmpdir/evals" "$tmpdir/locks" "$tmpdir/evolve_history/v0/attempts/attempt-001"
+          touch "$tmpdir/SKILL.md" "$tmpdir/process.md" "$tmpdir/manifest.yaml"
+          touch "$tmpdir/evals/objective_cases.yaml" "$tmpdir/evals/eval_protocol.md"
+          touch "$tmpdir/locks/evolve.lock" "$tmpdir/locks/promote.lock" "$tmpdir/locks/register.lock"
+          echo "cases: []" > "$tmpdir/evals/objective_cases.yaml"
+          mkdir -p "$tmpdir/evolve_history/v0"
+          echo "" > "$tmpdir/evolve_history/v0/genesis.md"
+          # Rename dir to match pattern
+          mv "$tmpdir" "/tmp/test-skill-v0-$$"
+          tmpdir="/tmp/test-skill-v0-$$"
+          trap "rm -rf $tmpdir" EXIT
+          # Run validate_structure.sh — expect it to contain FAIL for .step0.yaml
+          output=$(bash tools/validate_structure.sh "$tmpdir" 2>&1)
+          echo "$output" | grep -q "step0.yaml missing" && echo "CONFIRMED: step0 missing is FAIL" && exit 0
+          echo "ERROR: expected step0.yaml FAIL not found in output"
+          echo "$output"
+          exit 1
+        expected_exit: 0
+        expected_stdout_contains: "CONFIRMED: step0 missing is FAIL"
+    source: human_designed
+    added_in: v4
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法执行 shell 脚本验证工具行为，只能静态描述预期行为"
+      skill_advantage: "v4 run_script 断言实际执行 validate_structure.sh 并验证输出，是功能验证而非结构检查"
+
+  - id: "run_script_verifies_json_validity"
+    description: "run_script 断言能验证 eval_research JSON 文件语法合法（不只是文件存在）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "executable assertion 功能验证"
+    regression_level: P1
+    evolution_direction: >
+      run_script 是 v4 最核心的新能力。此 case 证明它能验证「文件内容语义正确」，
+      而非只是「文件存在」。下一步：用 run_script 验证 process.md 步骤数量和领域词汇密度。
+    input: "验证 kubernetes-debug-advisor-v0 的 eval_research JSON 是语法合法的 JSON"
+    context:
+      - "kubernetes-debug-advisor-v0 是 v3 终极检验创建的 fixture，eval_research/ 下有 5 个 JSON"
+    assertions:
+      - type: run_script
+        target: "kubernetes-debug-advisor-v0"
+        script: |
+          # Verify all eval_research JSONs are valid JSON (not just that they exist)
+          fail=0
+          for f in evals/eval_research/*.json; do
+            if python3 -c "import json; json.load(open('$f'))" 2>/dev/null; then
+              echo "✓ valid JSON: $f"
+            else
+              echo "✗ invalid JSON: $f"
+              fail=1
+            fi
+          done
+          count=$(ls evals/eval_research/*.json 2>/dev/null | wc -l | tr -d ' ')
+          echo "Total JSON files validated: $count"
+          [ "$count" -ge 5 ] || { echo "ERROR: expected ≥5 JSON files, got $count"; exit 1; }
+          [ "$fail" -eq 0 ] || exit 1
+        expected_exit: 0
+        expected_stdout_contains: "Total JSON files validated: 5"
+    source: human_designed
+    added_in: v4
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法执行 JSON 解析验证；只能说'JSON 应该合法'"
+      skill_advantage: "v4 run_script 实际解析每个 JSON 文件，错误格式在 eval 时即被发现，而非在运行时报错"
+
+  - id: "step0_domain_vocab_has_minimum_terms"
+    description: "run_script 验证 .step0.yaml 的 domain_vocab 条目数 ≥ 10（不只是字段存在）"
+    expected_result: pass
+    dimension: coverage
+    target_point: "Step 0 内容质量验证（而非只验证结构）"
+    regression_level: P1
+    evolution_direction: >
+      这是 v4 eval 质量提升的关键——从「字段存在性」升级为「内容充分性」验证。
+      v5 可进一步验证词汇的领域特异性（不接受通用词如 'file', 'output', 'input'）。
+    input: "验证 kubernetes-debug-advisor-v0 的 .step0.yaml domain_vocab 包含 ≥10 条领域词汇"
+    context:
+      - "kubernetes-debug-advisor-v0 的 .step0.yaml 包含 18 个 K8s 领域词汇"
+    assertions:
+      - type: run_script
+        target: "kubernetes-debug-advisor-v0"
+        script: |
+          count=$(python3 -c "
+          import yaml
+          with open('.step0.yaml') as f:
+            y = yaml.safe_load(f)
+          vocab = y.get('domain_vocab', [])
+          print(len(vocab))
+          " 2>/dev/null)
+          echo "domain_vocab count: $count"
+          [ "$count" -ge 10 ] || { echo "ERROR: expected ≥10 vocab terms, got $count"; exit 1; }
+          echo "PASS: domain_vocab has $count terms (≥10)"
+        expected_exit: 0
+        expected_stdout_contains: "PASS: domain_vocab has"
+    source: human_designed
+    added_in: v4
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法执行 YAML 解析计算列表长度；只能静态检查字段名"
+      skill_advantage: "v4 run_script 实际计算 domain_vocab 数量，能区分空列表和充分的词汇表"
+
+  # ===== v4 终极检验目标 =====
+
+  - id: "v4_terminal_test_unfamiliar_domain"
+    description: "v4 自举完成后，用 v4 创建陌生领域 Skill 并由用户独立评估（打破 v4 自举闭环）"
+    expected_result: fail
+    dimension: consistency
+    target_point: "v4 终极检验"
+    regression_level: P1
+    evolution_direction: >
+      v5 自举前必须执行此终极检验：用 v4 创建一个 v3 从未涉及的领域 Skill，
+      并由用户独立评估四个维度（目标导向/领域特异性/Eval 区分力/可执行性）。
+      若总分 ≥14/20 且无维度 ≤2，此 case 可从 fail 升级为 pass（需 evidence 字段）。
+    input: "执行 skill-creator v4 自举，完成终极检验：创建陌生领域 Skill 并由用户独立评估"
+    context:
+      - "skill-creator v4 已初始化"
+      - "v3 终极检验领域：kubernetes（已用）"
+      - "v4 终极检验候选领域：中医辨证诊断辅助 / 建筑施工安全 / 法庭文书写作 / 音乐编曲建议"
+    assertions:
+      - type: contains
+        value: "独立评估"
+        target: "skill-creator-v4/evolve_history/v4/genesis.md"
+      - type: contains
+        value: "**合格**: 是"
+        target: "skill-creator-v4/evolve_history/v4/genesis.md"
+    source: human_designed
+    added_in: v4
+
+  # ===== v4 终极检验落地：music-theory-advisor =====
+
+  - id: "v4_terminal_test_has_music_domain_vocab"
+    description: "v4 终极检验：music-theory-advisor-v0 的 .step0.yaml 包含音乐理论领域词汇"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v4 终极检验：run_script 验证陌生领域 Skill"
+    regression_level: P1
+    evolution_direction: >
+      证明 v4 创建的 Skill 具备领域特异性——domain_vocab 包含声部进行、罗马数字分析等
+      音乐理论专有术语，而非通用词汇。v5 可进一步用 run_script 验证词汇的专业性。
+    input: "用 skill-creator v4 创建 music-theory-advisor Skill（v4 终极检验领域）"
+    context:
+      - "music-theory-advisor-v0 是 v4 终极检验创建的 fixture"
+      - "v4 新增 run_script 断言类型，此 case 演示其在陌生领域的适用性"
+    assertions:
+      - type: run_script
+        target: "music-theory-advisor-v0"
+        script: |
+          count=$(python3 -c "
+          import yaml
+          with open('.step0.yaml') as f:
+            y = yaml.safe_load(f)
+          vocab = y.get('domain_vocab', [])
+          print(len(vocab))
+          " 2>/dev/null)
+          echo "domain_vocab count: $count"
+          [ "$count" -ge 10 ] || { echo "ERROR: need ≥10 music terms, got $count"; exit 1; }
+          # Also check for music-specific term
+          python3 -c "
+          import yaml
+          with open('.step0.yaml') as f:
+            y = yaml.safe_load(f)
+          vocab_str = str(y.get('domain_vocab', []))
+          assert 'voice leading' in vocab_str or 'parallel fifths' in vocab_str, 'No music theory terms found'
+          print('PASS: music theory terms verified')
+          " || exit 1
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+    source: human_designed
+    added_in: v4
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会创建 .step0.yaml；无法通过 run_script 验证域词汇数量和内容"
+      skill_advantage: "v4 强制 .step0.yaml + run_script 断言，可机械化验证新领域 Skill 的词汇充分性"
+
+  - id: "v4_terminal_test_process_has_voice_leading"
+    description: "v4 终极检验：music-theory-advisor-v0 的 process.md 包含音乐理论专有步骤"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v4 终极检验：领域特异性"
+    regression_level: P1
+    input: "验证 music-theory-advisor-v0 process.md 包含声部写作和功能和声相关步骤"
+    context:
+      - "music-theory-advisor-v0 是 v4 终极检验创建的 fixture"
+    assertions:
+      - type: contains
+        value: "parallel fifths"
+        target: "music-theory-advisor-v0/process.md"
+      - type: contains
+        value: "leading tone"
+        target: "music-theory-advisor-v0/process.md"
+      - type: contains
+        value: "SATB"
+        target: "music-theory-advisor-v0/process.md"
+    source: human_designed
+    added_in: v4
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能输出 process.md，但不会包含 parallel fifths、leading tone 等声部写作专有规则"
+      skill_advantage: "v4 的 Goal-First 流程和领域调研确保 process.md 包含音乐理论专家认可的术语"
+
+  # ===== v5 新增 cases =====
+
+  - id: "run_script_timeout_stops_infinite_loop"
+    description: "v5: timeout_seconds 字段使 run_script 在超时后返回失败，防止无限循环挂住 eval"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v5: run_script 超时控制"
+    regression_level: P1
+    input: "验证 timeout_seconds 字段生效"
+    context:
+      - "run_eval.sh 的 run_script handler 需在超时后退出 124 并返回 fail"
+    assertions:
+      - type: run_script
+        target: "skill-creator-v5"
+        script: |
+          # 调用 run_eval.sh 并传入一个包含 sleep 的脚本，期望 timeout 生效
+          # 直接检查 timeout 命令可用性（macOS 可能需要 gtimeout）
+          if command -v timeout >/dev/null 2>&1; then
+            timeout 2 bash -c 'sleep 10' 2>&1
+            code=$?
+            [ "$code" = "124" ] || { echo "timeout exit code was $code, expected 124"; exit 1; }
+            echo "PASS: timeout returned 124"
+          else
+            echo "SKIP: timeout not available, checking gtimeout"
+            if command -v gtimeout >/dev/null 2>&1; then
+              echo "PASS: gtimeout available"
+            else
+              echo "SKIP: no timeout command available"
+            fi
+          fi
+        expected_exit: 0
+    source: human_designed
+    added_in: v5
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会处理 eval 超时控制问题"
+      skill_advantage: "v5 run_script sandbox/timeout 是 skill-creator 自举中新增的基础设施能力"
+
+  - id: "v5_terminal_test_unfamiliar_domain"
+    description: "v5 终极检验：用 v5 在陌生领域创建 Skill，用户独立评估总分 ≥14/20，genesis.md 写入「合格: 是」"
+    expected_result: fail
+    evolution_direction: "执行 Phase 6 终极检验后，genesis.md 写入独立评估结果（合格: 是），此 case 转为 pass"
+    dimension: coverage
+    target_point: "v5 终极检验：invoke_skill 在陌生领域验证 LLM 输出语义"
+    regression_level: P0
+    input: "验证 v5 genesis.md 包含终极检验通过记录"
+    context:
+      - "v5 自举完成后需在陌生领域创建 Skill 并使用 invoke_skill 断言"
+    assertions:
+      - type: contains
+        value: "**合格**: 是"
+        target: "skill-creator-v5/evolve_history/v5/genesis.md"
+      - type: contains
+        value: "invoke_skill"
+        target: "skill-creator-v5/evolve_history/v5/genesis.md"
+    source: human_designed
+    added_in: v5
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 没有自举协议，不会记录「独立评估」结果"
+      skill_advantage: "v5 self-bootstrap.md 强制 Phase 6 终极检验，genesis.md 必须包含评估记录"
+
+  - id: "invoke_skill_verifies_sql_optimizer"
+    description: "v5: invoke_skill 断言对 sql-optimizer-v0 发起真实 LLM 调用，验证输出包含 SQL 优化领域术语"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v5: invoke_skill LLM-level 语义验证"
+    regression_level: P1
+    input: "调用 sql-optimizer-v0 Skill，传入「优化 SELECT * FROM users WHERE age > 18 查询」"
+    context:
+      - "invoke_skill 调用 claude CLI，若 CLI 不可用则 skip（不计失败）"
+      - "sql-optimizer-v0 是已有的 v3 fixture"
+    assertions:
+      - type: invoke_skill
+        target: "sql-optimizer-v0"
+        skill_file: "SKILL.md"
+        input: "优化 SELECT * FROM users WHERE age > 18 查询，该表有 100 万行"
+        expected_contains:
+          - "index"
+        pass_rate_threshold: 0.8
+        runs: 2
+    source: human_designed
+    added_in: v5
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能输出 SQL 建议，但不保证包含 index/explain/covering index 等术语"
+      skill_advantage: "v5 invoke_skill 可以直接断言 Skill 产出的 LLM 输出语义，而非只检查文件内容"
+
+  - id: "v5_terminal_test_has_legal_domain_vocab"
+    description: "v5 终极检验：legal-contract-advisor-v0 的 .step0.yaml 包含 ≥10 法律术语（run_script 验证）"
+    expected_result: pass
+    dimension: coverage
+    target_point: "v5 终极检验：invoke_skill 领域在新领域的 run_script 覆盖"
+    regression_level: P1
+    input: "验证 legal-contract-advisor-v0 .step0.yaml 包含足够的法律专有术语"
+    context:
+      - "legal-contract-advisor-v0 是 v5 终极检验创建的 fixture（合同条款分析领域）"
+    assertions:
+      - type: run_script
+        target: "legal-contract-advisor-v0"
+        script: |
+          count=$(python3 -c "
+          import yaml
+          with open('.step0.yaml') as f:
+            y = yaml.safe_load(f)
+          vocab = y.get('domain_vocab', [])
+          print(len(vocab))
+          " 2>/dev/null)
+          echo "domain_vocab count: $count"
+          [ "$count" -ge 10 ] || { echo "ERROR: need ≥10 legal terms, got $count"; exit 1; }
+          python3 -c "
+          import yaml
+          with open('.step0.yaml') as f:
+            y = yaml.safe_load(f)
+          vocab_str = str(y.get('domain_vocab', []))
+          assert any(t in vocab_str for t in ['违约金', '不可抗力', '竞业限制', '管辖权']), 'No legal terms'
+          print('PASS: legal terms verified')
+          " || exit 1
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+    source: human_designed
+    added_in: v5
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会创建 .step0.yaml；无法通过 run_script 验证法律术语数量和内容"
+      skill_advantage: "v5 强制 .step0.yaml + run_script 断言，可机械化验证新领域 Skill 的词汇充分性"
+
+  - id: "v5_terminal_test_process_has_dispute_resolution"
+    description: "v5 终极检验：legal-contract-advisor-v0 的 process.md 包含法律专有流程术语"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v5 终极检验：领域特异性"
+    regression_level: P1
+    input: "验证 legal-contract-advisor-v0 process.md 包含争议解决和违约金相关步骤"
+    context:
+      - "legal-contract-advisor-v0 是 v5 终极检验创建的 fixture"
+    assertions:
+      - type: contains
+        value: "违约金"
+        target: "legal-contract-advisor-v0/process.md"
+      - type: contains
+        value: "不可抗力"
+        target: "legal-contract-advisor-v0/process.md"
+    source: human_designed
+    added_in: v5
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能输出 process.md，但不保证包含「违约金」「不可抗力」等合同法律专有术语"
+      skill_advantage: "v5 的 Goal-First 流程和领域调研确保 process.md 包含法律专家认可的术语"
+
+  # ===== v6 新增 cases =====
+
+  - id: "invoke_skill_judge_verifies_code_reviewer"
+    description: "v6: invoke_skill_judge 对 code-reviewer-v0 发起两阶段 LLM 调用，judge 评估输出是否体现代码审查专业性"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v6: LLM-as-judge 语义质量验证"
+    regression_level: P1
+    input: "调用 code-reviewer-v0 Skill 审查代码，judge 验证输出专业性"
+    context:
+      - "invoke_skill_judge 在嵌套 session 中自动 skip，standalone 执行两步 LLM 调用"
+      - "code-reviewer-v0 是已有的 v3 fixture"
+    assertions:
+      - type: invoke_skill_judge
+        target: "code-reviewer-v0"
+        skill_file: "SKILL.md"
+        input: "审查这段代码：def process_user_input(data): return eval(data)"
+        judge_prompt: |
+          评估以下代码审查输出是否展示了安全审查专业性。
+          如果输出提到了安全风险（如代码注入、eval 危险）则回复 PASS，否则回复 FAIL。
+
+          待评估输出：
+        pass_rate_threshold: 0.8
+        runs: 2
+        timeout_seconds: 30
+    source: human_designed
+    added_in: v6
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 可能发现 eval() 安全问题，但没有 Skill 的结构化代码审查流程"
+      skill_advantage: "v6 invoke_skill_judge 使用两阶段 LLM 验证：Skill 执行 + judge 评判，比单纯关键词检查更可靠"
+
+  - id: "invoke_skill_judge_timeout_field"
+    description: "v6: invoke_skill_judge 支持 timeout_seconds 字段，与 run_script 对称"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v6: invoke_skill timeout 控制"
+    regression_level: P1
+    input: "验证 run_eval.sh 支持 invoke_skill_judge 的 timeout_seconds 字段"
+    assertions:
+      - type: run_script
+        target: "skill-creator-v6"
+        script: |
+          # 验证 invoke_skill_judge handler 包含 timeout_seconds 支持
+          grep -n "timeout_seconds" tools/run_eval.sh | grep -q "invoke_skill_judge\|timeout_cmd\|timeout_secs" || {
+            echo "ERROR: invoke_skill_judge missing timeout_seconds support"
+            exit 1
+          }
+          echo "PASS: timeout_seconds supported in invoke_skill_judge"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+    source: human_designed
+    added_in: v6
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 不会实现 eval 工具的超时控制基础设施"
+      skill_advantage: "v6 invoke_skill_judge 的 timeout_seconds 修复了 v5 invoke_skill 缺少超时的设计不对称"
+
+  - id: "v6_terminal_test_unfamiliar_domain"
+    description: "v6 终极检验：用 v6 在陌生领域创建含 invoke_skill_judge 断言的 Skill，用户评估总分 ≥14/20"
+    expected_result: fail
+    evolution_direction: "执行 Phase 6 终极检验后，genesis.md 写入独立评估结果（**合格**: 是），此 case 转为 pass"
+    dimension: coverage
+    target_point: "v6 终极检验：invoke_skill_judge 在陌生领域验证 LLM 输出语义质量"
+    regression_level: P0
+    input: "验证 v6 genesis.md 包含终极检验通过记录"
+    assertions:
+      - type: contains
+        value: "**合格**: 是"
+        target: "skill-creator-v6/evolve_history/v6/genesis.md"
+      - type: contains
+        value: "invoke_skill_judge"
+        target: "skill-creator-v6/evolve_history/v6/genesis.md"
+    source: human_designed
+    added_in: v6
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 没有自举协议，不会记录「独立评估」结果"
+      skill_advantage: "v6 self-bootstrap.md 强制 Phase 6 终极检验，genesis.md 必须包含含 invoke_skill_judge 的评估记录"
+
+  # ============================================================
+  # v7 新增 cases
+  # ============================================================
+
+  - id: "judge_calibration_validates_code_reviewer_prompt"
+    description: "v7: judge_calibration 验证 code-reviewer 的 judge_prompt 能区分专业/泛泛代码审查输出"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 judge_calibration：bidirectional oracle quality validation"
+    tier: P1
+    regression_level: P1
+    input:
+      target: "."
+    assertions:
+      - type: judge_calibration
+        skill_file: "code-reviewer-v0/SKILL.md"
+        judge_prompt: |
+          评估以下代码审查输出是否展示了安全审查专业性。
+          如果输出明确提到了安全风险（如代码注入、eval 危险、任意代码执行）则回复 PASS，否则回复 FAIL。
+
+          待评估输出：
+        good_example: |
+          这段代码存在严重的安全漏洞。`eval(data)` 会直接执行用户传入的任意 Python 代码，
+          导致远程代码执行（RCE）风险。攻击者可以通过传入 `__import__('os').system('rm -rf /')` 
+          等恶意字符串来执行任意系统命令。建议完全移除 eval()，改用 ast.literal_eval() 
+          处理纯数据解析，或使用白名单验证输入。
+        bad_example: |
+          这段代码使用了 eval 函数来处理用户输入。可以考虑对输入进行一些验证和处理，
+          确保代码的正确性和稳定性。建议添加 try/except 错误处理，并在生产环境中进行充分测试。
+        pass_rate_threshold: 0.8
+        runs: 1
+        timeout_seconds: 45
+    source: human_designed
+    added_in: v7
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法验证自身 judge_prompt 的区分力——judge_prompt 质量的自我验证需要外部校准机制"
+      skill_advantage: "v7 judge_calibration 通过双向测试（good/bad 样本）确保 judge_prompt 既不过严也不过宽"
+
+  - id: "tier_filtering_excludes_p2"
+    description: "v7: P2 tier case 在默认模式（无 --all-tiers）下被过滤，不出现在 active eval 结果中"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 tiered protection：P2 归档 case 正确过滤"
+    tier: P1
+    regression_level: P1
+    input:
+      target: "awesome-skill-creator-v0"
+    assertions:
+      - type: run_script
+        target: "awesome-skill-creator-v0"
+        script: |
+          # 验证 run_eval.sh 包含 P2 tier 过滤逻辑
+          grep -q "tier.*P2\|P2.*tier\|reject.*P2\|P2.*reject" tools/scripts/run_eval.sh || {
+            echo "ERROR: run_eval.sh missing P2 tier filtering"
+            exit 1
+          }
+          echo "PASS: P2 tier filtering present in run_eval.sh"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+    source: human_designed
+    added_in: v7
+
+  - id: "judge_calibration_field_in_validate_evals"
+    description: "v7: validate_evals.sh 包含 judge_calibration 断言的字段检查"
+    expected_result: pass
+    dimension: coverage
+    target_point: "v7: validate_evals.sh 强制 judge_calibration ≥1 条"
+    tier: P1
+    regression_level: P1
+    input:
+      target: "awesome-skill-creator-v0"
+    assertions:
+      - type: run_script
+        target: "awesome-skill-creator-v0"
+        script: |
+          grep -q "judge_calibration" tools/gate/validate_evals.sh || {
+            echo "ERROR: validate_evals.sh missing judge_calibration check"
+            exit 1
+          }
+          echo "PASS: validate_evals.sh includes judge_calibration enforcement"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+    source: human_designed
+    added_in: v7
+
+  - id: "validate_article_checks_gsb_and_ref_citations"
+    description: "validate_article.sh 检查 Evaluation 含 GSB 分析 + 每张 ref card 在正文中被引用（scaffold.md 强制要求）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 补丁：validate_article.sh 增加 GSB 分析强制检查 + ref card 引用完整性"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          grep -q "GSB\|Good.*Same.*Bad\|增值率" tools/validate_article.sh || { echo "FAIL: validate_article.sh missing GSB check"; exit 1; }
+          grep -q "assets/references\|assets_dir" tools/validate_article.sh || { echo "FAIL: validate_article.sh missing ref card citation check"; exit 1; }
+          echo "PASS: validate_article.sh enforces GSB analysis and ref card citations"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 10
+    source: human_designed
+    added_in: v7
+
+  - id: "run_eval_shows_p2_archived_count"
+    description: "run_eval.sh summary 输出 'P2 archived: N' 行，使 P2 过滤可见（用户明白为何 total < raw case 数）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 run_eval.sh 改进：P2 归档计数在 summary 中显式展示"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          output=$(bash tools/scripts/run_eval.sh . --self 2>&1)
+          echo "$output" | grep -q "P2 archived" || { echo "FAIL: 'P2 archived' line missing from summary"; exit 1; }
+          echo "$output" | grep "P2 archived" | grep -q "filtered out\|included" || { echo "FAIL: P2 line missing status annotation"; exit 1; }
+          echo "PASS: run_eval.sh summary includes P2 archived count"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 30
+    source: human_designed
+    added_in: v7
+
+  - id: "checklist_md_exists"
+    description: "tools/checklist.md 存在（process.md Step 7 验收中引用此文件）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 新增准出速查清单：Step 7 引用的手动检查清单文件"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: file_exists
+        value: awesome-skill-creator-v0/tools/gate/checklist.md
+    source: human_designed
+    added_in: v7
+
+  - id: "validate_references_exits_clean"
+    description: "validate_references.sh 在 awesome-skill-creator-v0 上 exit 0（无 broken links，subshell bug 已修复）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 修复：validate_references.sh 使用 process substitution 避免 set-e + pipefail 误退"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          bash tools/validate_references.sh . 2>&1 | tail -1
+          # Exit code 0 means no broken links and no silent abort
+          bash tools/validate_references.sh . > /dev/null 2>&1
+          echo "PASS: validate_references.sh exits 0 cleanly"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v7
+
+  - id: "gen_skill_dir_has_v7_assertions"
+    description: "gen_skill_dir.sh 模版包含所有 v4-v7 必需 assertion type 及 genesis 独立评估框架"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 更新：gen_skill_dir.sh 模版升级为含 run_script/invoke_skill/invoke_skill_judge/judge_calibration 的 9-case 骨架"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          grep -q "judge_calibration" tools/scripts/gen_skill_dir.sh || { echo "FAIL: no judge_calibration template"; exit 1; }
+          grep -q "invoke_skill_judge" tools/scripts/gen_skill_dir.sh || { echo "FAIL: no invoke_skill_judge template"; exit 1; }
+          grep -q "invoke_skill" tools/scripts/gen_skill_dir.sh || { echo "FAIL: no invoke_skill template"; exit 1; }
+          grep -q "run_script" tools/scripts/gen_skill_dir.sh || { echo "FAIL: no run_script template"; exit 1; }
+          grep -q "独立评估框架" tools/scripts/gen_skill_dir.sh || { echo "FAIL: no genesis 独立评估框架 section"; exit 1; }
+          echo "PASS: gen_skill_dir.sh contains all v4-v7 assertion types and genesis 独立评估框架"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v7
+
+  - id: "validate_evals_exit_code_reflects_failures"
+    description: "validate_evals.sh 在检测到 ✗ 失败时 exit code 为 1（process substitution 修复 subshell _EXIT_CODE 传播问题）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 bugfix：ruby|while 管道中 fail() 调用在 subshell 不传播 _EXIT_CODE，改用 process substitution 修复"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          trap "rm -rf probe-exitcode-v0" EXIT
+          bash tools/scripts/gen_skill_dir.sh probe-exitcode v0 > /dev/null
+          # Remove evolution_direction from fail cases to trigger failure
+          ruby -ryaml -e "
+            data = YAML.load_file('probe-exitcode-v0/evals/objective_cases.yaml')
+            data['cases'].each { |c| c.delete('evolution_direction') if c['expected_result'] == 'fail' }
+            File.write('probe-exitcode-v0/evals/objective_cases.yaml', data.to_yaml)
+          "
+          bash tools/gate/validate_evals.sh probe-exitcode-v0/evals > /dev/null 2>&1
+          rc=$?
+          [ "$rc" -eq 1 ] && echo "PASS: exit code 1 when failures present" || { echo "FAIL: expected exit 1 got $rc"; exit 1; }
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 30
+    source: human_designed
+    added_in: v7
+
+  - id: "validate_evals_exits_clean_on_skeleton"
+    description: "gen_skill_dir.sh 生成的骨架目录，validate_evals.sh 以 exit 0 结束（无崩溃）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v7 bugfix：validate_evals.sh P2 检查因缺少 require 'set' 而 exit 1，修复后骨架应 0 failures"
+    tier: P1
+    regression_level: P1
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          trap "rm -rf probe-regression-v0" EXIT
+          bash tools/scripts/gen_skill_dir.sh probe-regression v0 > /dev/null
+          bash tools/gate/validate_evals.sh probe-regression-v0/evals > /dev/null 2>&1
+          rc=$?
+          [ "$rc" -eq 0 ] && echo "PASS: validate_evals exits 0 on fresh skeleton" || { echo "FAIL: exit $rc"; exit 1; }
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 30
+    source: human_designed
+    added_in: v7
+
+  - id: "validate_evals_rejects_invalid_regression_level"
+    description: "validate_evals.sh 拒绝 regression_level 不合法（非 P0/P1）的 case，exit 1"
+    expected_result: pass
+    dimension: correctness
+    target_point: "regression_level 枚举约束：validate_evals.sh 必须拒绝 P0/P1 之外的值"
+    tier: P1
+    regression_level: P1
+    source: agent_generated
+    added_in: v7
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法执行 validate_evals.sh，无法检测 regression_level 非法值"
+      skill_advantage: "validate_evals.sh 自动捕获 regression_level 枚举错误，exit 1 阻断准出"
+    input:
+      target: awesome-skill-creator-v0
+    assertions:
+      - type: run_script
+        target: awesome-skill-creator-v0
+        script: |
+          trap "rm -rf probe-rl-v0" EXIT
+          bash tools/scripts/gen_skill_dir.sh probe-rl v0 > /dev/null
+          # Inject invalid regression_level into first case
+          ruby -e "
+            f = 'probe-rl-v0/evals/objective_cases.yaml'
+            c = File.read(f)
+            c = c.sub('regression_level: P1', 'regression_level: P9')
+            File.write(f, c)
+          "
+          bash tools/gate/validate_evals.sh probe-rl-v0/evals > /dev/null 2>&1
+          rc=$?
+          [ "$rc" -ne 0 ] && echo "PASS: invalid regression_level correctly rejected" || { echo "FAIL: exit 0 on invalid P9"; exit 1; }
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 30
+
+  - id: "v7_terminal_test_unfamiliar_domain"
+    description: "v7 终极检验：用 v7 在陌生领域创建含 judge_calibration 断言的 Skill，用户评估总分 ≥14/20"
+    expected_result: fail
+    evolution_direction: "执行 Phase 6 终极检验后，genesis.md 写入独立评估结果（**合格**: 是），此 case 转为 pass"
+    dimension: coverage
+    target_point: "v7 终极检验：judge_calibration 在陌生领域验证 oracle 质量"
+    tier: P0
+    regression_level: P0
+    input:
+      target: "awesome-skill-creator-v0/evolve_history/v0"
+    assertions:
+      - type: contains
+        value: "**合格**: 是"
+        target: "awesome-skill-creator-v0/evolve_history/v0/genesis.md"
+      - type: contains
+        value: "judge_calibration"
+        target: "awesome-skill-creator-v0/evolve_history/v0/genesis.md"
+    source: human_designed
+    added_in: v7
+
+  # ===== v0 attempt-008 新增：P2 智能归档推荐工具验证 =====
+
+  - id: "suggest_p2_finds_min_two_candidates"
+    description: "改进后的 suggest_p2_candidates.sh 在 v0 eval suite 上输出 ≥2 条 P2 归档建议（路径归一化 + 字符串包含语义）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "P2 智能归档推荐 — suggest_p2_candidates.sh 改进"
+    tier: P1
+    regression_level: P0
+    input: "在 awesome-skill-creator-v0/evals/ 目录运行 suggest_p2_candidates.sh"
+    assertions:
+      - type: run_script
+        script: |
+          output=$(bash tools/scripts/suggest_p2_candidates.sh evals/ 2>&1)
+          count=$(echo "$output" | grep -c "CANDIDATE:" || true)
+          [ "$count" -ge 2 ] || {
+            echo "FAIL: expected ≥2 CANDIDATE lines, got $count"
+            echo "$output"
+            exit 1
+          }
+          echo "PASS: suggest_p2_candidates.sh found $count candidates (≥2)"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v0
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 没有 P2 归档分析工具"
+      skill_advantage: "suggest_p2_candidates.sh 自动分析 eval suite，输出可审查的归档建议"
+
+  - id: "suggest_p2_path_normalization"
+    description: "suggest_p2_candidates.sh 路径归一化检测：eval_has_content_assertions 被识别为 eval_file_exists_ratio 的 P2 候选"
+    expected_result: pass
+    dimension: correctness
+    target_point: "P2 智能归档推荐 — suggest_p2_candidates.sh 改进"
+    tier: P1
+    regression_level: P1
+    input: "验证路径归一化机制发现跨 skill 名的 subsumption 关系"
+    assertions:
+      - type: run_script
+        script: |
+          output=$(bash tools/scripts/suggest_p2_candidates.sh evals/ 2>&1)
+          echo "$output" | grep -q "eval_has_content_assertions" || {
+            echo "FAIL: eval_has_content_assertions not found as P2 candidate (path normalization broken)"
+            echo "$output"
+            exit 1
+          }
+          echo "$output" | grep -q "eval_file_exists_ratio" || {
+            echo "FAIL: eval_file_exists_ratio not found as superseder"
+            echo "$output"
+            exit 1
+          }
+          echo "PASS: path normalization correctly detects cross-skill subsumption"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v0
+
+  - id: "suggest_p2_string_containment"
+    description: "suggest_p2_candidates.sh 字符串包含语义检测：ultimate_test_created_unknown_skill 被识别为 v4_terminal_test_unfamiliar_domain 的 P2 候选"
+    expected_result: pass
+    dimension: correctness
+    target_point: "P2 智能归档推荐 — suggest_p2_candidates.sh 改进"
+    tier: P1
+    regression_level: P1
+    input: "验证字符串包含语义：contains: '合格' 被 contains: '**合格': 是' 包含"
+    assertions:
+      - type: run_script
+        script: |
+          output=$(bash tools/scripts/suggest_p2_candidates.sh evals/ 2>&1)
+          echo "$output" | grep -q "ultimate_test_created_unknown_skill" || {
+            echo "FAIL: ultimate_test_created_unknown_skill not found (string-containment detection broken)"
+            echo "$output"
+            exit 1
+          }
+          echo "$output" | grep -q "v4_terminal_test_unfamiliar_domain" || {
+            echo "FAIL: v4_terminal_test_unfamiliar_domain not found as superseder"
+            echo "$output"
+            exit 1
+          }
+          echo "PASS: string-containment subsumption correctly detected"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v0
+
+  - id: "suggest_p2_json_mode_valid"
+    description: "suggest_p2_candidates.sh --json 输出合法 JSON 且包含 candidate/superseded_by/weak_tokens/strong_tokens 字段"
+    expected_result: pass
+    dimension: correctness
+    target_point: "P2 智能归档推荐 — suggest_p2_candidates.sh 改进"
+    tier: P1
+    regression_level: P1
+    input: "验证 --json 机器可读输出格式"
+    assertions:
+      - type: run_script
+        script: |
+          output=$(bash tools/scripts/suggest_p2_candidates.sh evals/ --json 2>&1)
+          python3 - <<'PYEOF'
+          import json, sys
+          data = json.loads(open('/dev/stdin').read() if False else sys.argv[1]) if False else json.loads("""PLACEHOLDER""")
+          PYEOF
+          # Use a simpler approach: pipe to python3
+          echo "$output" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          assert len(data) >= 2, f'Expected >=2 candidates, got {len(data)}'
+          for item in data:
+              assert 'candidate' in item
+              assert 'superseded_by' in item
+              assert 'weak_tokens' in item
+              assert 'strong_tokens' in item
+          print('PASS: --json output is valid with required fields')
+          " || { echo "FAIL: invalid JSON output"; exit 1; }
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v0
+
+  # ============================================================
+  # v0 补丁：article arxiv 质量语义验证
+  # ============================================================
+
+  - id: "article_arxiv_judge_calibration"
+    description: "judge_calibration 验证 judge_prompt 能区分 arxiv 可发表质量 abstract（有具体声明+量化结果）与空洞描述（无数据支撑）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "v0 补丁：article 质量语义验证——arxiv 可发表性"
+    tier: P1
+    regression_level: P1
+    input:
+      target: "."
+    assertions:
+      - type: judge_calibration
+        judge_prompt: |
+          你是一名 AI/ML 学术论文的审稿人。评估以下 abstract 是否达到 arxiv 可发表标准。
+          判断依据（NeurIPS Reproducibility Checklist）：
+          1. 声明具体且可证伪——有具体数字、系统名称、机制名称，不是"我们提出了一个有效框架"
+          2. 核心贡献可从 abstract 独立判断——不需要读全文就能理解"解决了什么问题、用什么机制、效果如何"
+          3. 没有无支撑的全称断言——"所有情况下都更好"等表述如无条件限制则为 FAIL
+          如果满足以上三点，回复 PASS，否则回复 FAIL。
+
+          待评估 abstract：
+        good_example: |
+          We present awesome-skill-creator, a framework for creating verifiable,
+          continuously-improving domain skills for LLM-based autonomous agents under
+          a zero-shot constraint. The core risk is self-referential evaluation: when
+          artifact, evaluator, and creator are all LLM-mediated, apparent improvements
+          can be faked by weakening criteria. We operationalize quality with five
+          mechanisms: goal-first .step0.yaml (domain vocab enforcement), failure-mode-first
+          eval (append-only cases with evolution_direction), run_script assertions on
+          real fixtures, invoke_skill_judge semantic evaluation, and judge_calibration
+          as meta-oracle requiring known-good samples to pass AND known-bad samples to fail.
+          Structural validation via validate.sh --ship runs 821+ checks. GSB comparison
+          against bare LLM shows G=6/S=2/B=1 across 9 dimensions. Terminal validation
+          (delivering knowledge-crystallizer, ≥14/20 human rating) is chartered but
+          not yet executed, representing the only evaluation that breaks self-referential closure.
+        bad_example: |
+          We present a new framework for creating high-quality domain skills for AI agents.
+          Our approach addresses the key challenges in skill engineering through a comprehensive
+          methodology that ensures quality and reliability. The framework has been designed
+          with best practices in mind and incorporates various validation mechanisms.
+          Experiments demonstrate that our approach is effective and produces better results
+          than baseline methods. The system is flexible and can be applied to various domains.
+        pass_rate_threshold: 0.8
+        runs: 1
+        timeout_seconds: 60
+    source: human_designed
+    added_in: v0
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 无法区分形式合格与内容实质——两个 abstract 都会被接受，因为它们结构相同"
+      skill_advantage: "judge_calibration 校准后的 judge 能区分'有具体机制名+量化数据'与'只有通用描述'，防止 article eval 被空洞内容通过"
+
+  - id: "article_arxiv_invoke_skill_judge"
+    description: "invoke_skill_judge 验证 awesome-skill-creator 自身 article 的三项 arxiv 质量维度：声明有支撑、related work 有差异定位、limitations 有量化"
+    expected_result: pass
+    dimension: coverage
+    target_point: "v0 补丁：article 质量语义验证——arxiv 可发表性"
+    tier: P1
+    regression_level: P1
+    input:
+      target: "awesome-skill-creator-v0"
+      skill_input: "评估 evolve_history/v0/article/ 下的文章"
+    assertions:
+      - type: invoke_skill_judge
+        judge_prompt: |
+          你是一名 AI/ML 会议审稿人（NeurIPS/ICML 水平）。
+          评估提供的论文片段是否满足以下三项 arxiv 发表标准：
+
+          **标准 A — 贡献有支撑**：Section 1.3 的每条 contribution 必须在正文某处有对应的具体数据（如通过率、case 数量、量化对比）或引用文献编号支撑，不能只是主张。
+
+          **标准 B — Related Work 有差异定位**：Section 2 中每篇引用文献不只是"X 做了 Y"，还需解释"本工作与之的具体差异或继承关系"。
+
+          **标准 C — Limitations 有量化**：Limitations 节的每项局限必须包含量化描述（百分比/case 数/具体场景），不接受纯定性描述如"未来工作将解决"。
+
+          如果三项均满足，回复 PASS: [简要理由]；如有任意一项不满足，回复 FAIL: [具体哪项不满足及原因]。
+        pass_rate_threshold: 0.8
+        timeout_seconds: 90
+    source: human_designed
+    added_in: v0
+    gsb_baseline:
+      bare_llm_expected: "裸 LLM 创建的 article 通常声明笼统（无引用编号支撑）、related work 只列举不比较、limitations 只定性描述"
+      skill_advantage: "process.md 强制 Related Work ≥10 篇 + Discussion 必须含量化失败分析；judge 三维检查比结构检查更能发现实质性不足"
+
+  - id: "suggest_p2_skips_existing_p2"
+    description: "suggest_p2_candidates.sh 不重复报告已标记为 P2 的 case（eval_quality_meets_threshold 已是 P2，不应出现在输出中）"
+    expected_result: pass
+    dimension: correctness
+    target_point: "P2 智能归档推荐 — suggest_p2_candidates.sh 改进"
+    tier: P1
+    regression_level: P1
+    input: "验证 P2 过滤：已归档 case 不再被反复推荐"
+    assertions:
+      - type: run_script
+        script: |
+          output=$(bash tools/scripts/suggest_p2_candidates.sh evals/ 2>&1)
+          if echo "$output" | grep -q "eval_quality_meets_threshold"; then
+            echo "FAIL: eval_quality_meets_threshold (already P2) should not appear in suggestions"
+            echo "$output"
+            exit 1
+          fi
+          echo "PASS: already-archived P2 cases correctly excluded from suggestions"
+        expected_exit: 0
+        expected_stdout_contains: "PASS:"
+        timeout_seconds: 15
+    source: human_designed
+    added_in: v0

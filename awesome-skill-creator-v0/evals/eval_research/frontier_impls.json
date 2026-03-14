@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-03-14",
+  "skill_domain": "skill engineering, LLM workflow automation, eval-driven development",
+  "agent_type": "frontier-impl-analysis",
+  "findings": [
+    {
+      "title": "DSPy: Compiling Declarative Language Model Calls into Self-Improving Pipelines",
+      "source": "https://arxiv.org/abs/2310.03714",
+      "year": "2023",
+      "key_finding": "Declarative specification of LLM pipelines enables automated optimization; separating program logic from prompt implementation allows systematic improvement without manual prompt engineering",
+      "design_impact": "process.md 的声明式流程设计参考：每步骤有明确 input/output，使自动优化成为可能"
+    },
+    {
+      "title": "LangChain / LangGraph: Agent Orchestration Frameworks",
+      "source": "https://github.com/langchain-ai/langgraph",
+      "year": "2024",
+      "key_finding": "Graph-based agent orchestration enables parallel sub-agent execution with shared state; node-level evaluation enables step-by-step quality control",
+      "design_impact": "5 类 sub-agent 并行调研架构的工程参考；未来 invoke_step_judge 的实现可参考 node-level evaluation"
+    },
+    {
+      "title": "Evals: OpenAI Evaluation Framework",
+      "source": "https://github.com/openai/evals",
+      "year": "2023",
+      "key_finding": "Structured eval registry with YAML case definitions; model-graded eval (LLM-as-judge) is standard practice for subjective quality assessment",
+      "design_impact": "objective_cases.yaml 的 YAML 格式设计参考；invoke_skill_judge 对应 model-graded eval 模式"
+    },
+    {
+      "title": "PromptFoo: LLM Testing Framework",
+      "source": "https://github.com/promptfoo/promptfoo",
+      "year": "2024",
+      "key_finding": "CLI-based LLM testing with YAML test definitions; supports multiple assertion types including LLM-graded assertions; red-teaming capabilities for adversarial testing",
+      "design_impact": "validate.sh + run_eval.sh 的工具链设计参考；red-teaming 思路启发了 failure-mode-first eval 哲学"
+    }
+  ],
+  "top_insights": [
+    "声明式流程规范 + 结构化 eval 是 LLM 工作流工程的成熟模式",
+    "LLM-as-judge 已成为 LLM 输出质量评估的标准实践，需要双向校验防止偏差",
+    "并行 sub-agent 架构提升调研覆盖度，但需要结构化输出格式保证质量"
+  ],
+  "suggested_eval_cases": [
+    {
+      "description": "run_eval.sh 能正确执行 run_script 断言并报告结果",
+      "source_title": "PromptFoo: LLM Testing Framework",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    },
+    {
+      "description": "gen_skill_dir.sh 生成的骨架包含 judge_calibration 断言模板",
+      "source_title": "DSPy: Compiling Declarative Language Model Calls",
+      "dimension": "coverage",
+      "expected_result": "pass"
+    }
+  ]
+}

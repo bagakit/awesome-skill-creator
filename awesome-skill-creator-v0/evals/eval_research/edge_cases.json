@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-03-14",
+  "skill_domain": "skill engineering edge cases, eval failure modes, oracle quality edge cases",
+  "agent_type": "edge-cases",
+  "findings": [
+    {
+      "title": "Adversarial Prompting and Prompt Injection in LLM Systems",
+      "source": "https://arxiv.org/abs/2302.12173",
+      "year": "2023",
+      "key_finding": "LLM systems can be manipulated via carefully crafted inputs; eval systems are particularly vulnerable when the evaluation target is also an LLM; nested eval loops need isolation",
+      "design_impact": "Fixture 隔离原则（.tmp/eval/<skill>_<version>/）：防止 eval 产生的测试文件污染主目录"
+    },
+    {
+      "title": "Gaming and Shortcut Learning in LLM Benchmarks",
+      "source": "https://arxiv.org/abs/2209.09400",
+      "year": "2022",
+      "key_finding": "LLMs can achieve high scores on benchmarks through surface-level pattern matching rather than genuine capability; judge_prompt verbosity bias is a systematic shortcut",
+      "design_impact": "failure-mode-first eval 设计哲学：先问「坏输出是什么」而不是「好输出有什么特征」"
+    },
+    {
+      "title": "The Oracle Problem in Software Testing",
+      "source": "Baresi & Young, 2001, International Conference on Software Engineering",
+      "year": "2001",
+      "key_finding": "The oracle problem: determining correct test outcomes is often as hard as solving the original problem; automated oracle generation is an open research problem",
+      "design_impact": "judge_calibration 是 oracle problem 的工程化解法：用已知样本对验证 oracle（judge_prompt）的区分力"
+    }
+  ],
+  "top_insights": [
+    "eval 系统本身是攻击面：judge_prompt 偏差、样本污染、嵌套 session 限制都是真实风险",
+    "only-increase 约束 + P2 归档 + judge_calibration 形成三层防御：防止 eval gaming",
+    "Fixture 隔离是 eval 准确性的基础设施，不是可选项"
+  ],
+  "suggested_eval_cases": [
+    {
+      "description": "嵌套 session 下 judge_calibration 自动 skip 而非报 FAIL（不阻断 eval）",
+      "source_title": "Adversarial Prompting and Prompt Injection in LLM Systems",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    },
+    {
+      "description": "eval case 断言值包含领域特有词汇（非通用词），防止 shortcut 通过",
+      "source_title": "Gaming and Shortcut Learning in LLM Benchmarks",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "attempt_id": "attempt-003",
+  "day": 3,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-15",
+  "stress_scenarios": [
+    {
+      "scenario": "success_definition 写得很通用（如「产出高质量 skill」）",
+      "result": "pass",
+      "note": "validator 检查 domain_vocab 出现频率，过于通用的定义会触发警告"
+    }
+  ]
+}

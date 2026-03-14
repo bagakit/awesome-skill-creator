@@ -1,0 +1,18 @@
+{
+  "attempt_id": "attempt-001",
+  "timestamp": "2026-03-14",
+  "execution_status": "actual",
+  "command": "bash tools/gate/validate.sh awesome-skill-creator-v0 --ship",
+  "status": "pass",
+  "total": 830,
+  "passed": 830,
+  "failed": 0,
+  "warnings": 4,
+  "note": "Initial run had 9 failures (article word count below minimums). After completing article to 8519 words: 830 passed, 0 failed.",
+  "warnings_detail": [
+    "suggest_p2_candidates.sh stub not yet implemented",
+    "eval_research JSON files are abbreviated",
+    "terminal test not executed (by design)",
+    "run_blind_eval.sh not executed in standalone mode"
+  ]
+}

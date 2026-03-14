@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-03-14",
+  "skill_domain": "skill engineering, meta-skill, self-evolving AI systems",
+  "agent_type": "tool-analysis",
+  "findings": [
+    {
+      "title": "Anthropic Claude Code Skill System (Internal)",
+      "source": "context: CLAUDE.md and meta_whitepaper.md design principles",
+      "year": "2024",
+      "key_finding": "Skill files are YAML-frontmatter markdown files loaded as slash commands; federation protocol 1.0 governs skill registration and version management; only-increase eval principle prevents gaming",
+      "design_impact": "manifest.yaml federation_protocol 字段；SKILL.md frontmatter 只允许 name 和 description 两字段"
+    },
+    {
+      "title": "BenchBench: Meta-Benchmarking for LLM Evaluation Benchmarks",
+      "source": "https://arxiv.org/abs/2312.01051",
+      "year": "2023",
+      "key_finding": "Benchmark quality varies widely; evaluation benchmarks themselves need quality metrics; contamination and saturation are systemic risks in static benchmarks",
+      "design_impact": "only-increase + judge_calibration 的设计动机：防止 eval suite 退化为 benchmark contamination"
+    },
+    {
+      "title": "Promptimize: Systematic Prompt Evaluation and Optimization",
+      "source": "https://github.com/guardian/promptimize",
+      "year": "2023",
+      "key_finding": "Prompt quality can be systematically measured via structured test cases; regression testing prevents prompt improvements from breaking existing functionality",
+      "design_impact": "validate.sh 的 --ship 模式 + only-increase 原则：防止 prompt 改进导致功能回归"
+    }
+  ],
+  "top_insights": [
+    "竞品系统（PromptFoo、Evals）关注单次评估，缺少 self-evolution 的完整闭环",
+    "only-increase 约束 + P2 归档是 awesome-skill-creator 独有的约束管理机制",
+    "judge_calibration 在竞品工具中没有对应实现，是明确的差异化能力"
+  ],
+  "suggested_eval_cases": [
+    {
+      "description": "validate_evals.sh 检测到缺少 judge_calibration 断言时报 FAIL",
+      "source_title": "BenchBench: Meta-Benchmarking for LLM Evaluation Benchmarks",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    },
+    {
+      "description": "gen_skill_dir.sh 生成的 manifest.yaml 包含所有必须字段",
+      "source_title": "Anthropic Claude Code Skill System",
+      "dimension": "coverage",
+      "expected_result": "pass"
+    }
+  ]
+}

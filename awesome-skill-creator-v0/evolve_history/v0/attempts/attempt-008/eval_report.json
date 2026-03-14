@@ -1,0 +1,74 @@
+{
+  "attempt_id": "attempt-008",
+  "date": "2026-03-15",
+  "execution_status": "executed",
+  "target_point": "P2 智能归档推荐 — suggest_p2_candidates.sh 改进",
+  "eval_suite": "awesome-skill-creator-v0/evals/objective_cases.yaml",
+  "total_active_cases": 56,
+  "p2_archived_cases": 1,
+  "new_cases_this_attempt": 5,
+  "validate_summary": "753 passed, 0 failed, 0 warnings",
+  "new_cases_results": [
+    {
+      "case_id": "suggest_p2_finds_min_two_candidates",
+      "tier": "P1",
+      "regression_level": "P0",
+      "expected": "pass",
+      "actual": "pass",
+      "output": "PASS: suggest_p2_candidates.sh found 2 candidates (≥2)"
+    },
+    {
+      "case_id": "suggest_p2_path_normalization",
+      "tier": "P1",
+      "regression_level": "P1",
+      "expected": "pass",
+      "actual": "pass",
+      "output": "PASS: path normalization correctly detects cross-skill subsumption"
+    },
+    {
+      "case_id": "suggest_p2_string_containment",
+      "tier": "P1",
+      "regression_level": "P1",
+      "expected": "pass",
+      "actual": "pass",
+      "output": "PASS: string-containment subsumption correctly detected"
+    },
+    {
+      "case_id": "suggest_p2_json_mode_valid",
+      "tier": "P1",
+      "regression_level": "P1",
+      "expected": "pass",
+      "actual": "pass",
+      "output": "PASS: JSON valid with 2 candidates"
+    },
+    {
+      "case_id": "suggest_p2_skips_existing_p2",
+      "tier": "P1",
+      "regression_level": "P1",
+      "expected": "pass",
+      "actual": "pass",
+      "output": "PASS: already-archived P2 cases correctly excluded from suggestions"
+    }
+  ],
+  "regression_check": {
+    "previous_validate_summary": "705 passed, 0 failed, 0 warnings",
+    "current_validate_summary": "753 passed, 0 failed, 0 warnings",
+    "delta": "+48 checks (5 new run_script cases × ~9 validate checks each + ref card checks + article citation checks)",
+    "regressions": "none"
+  },
+  "p2_candidates_found": [
+    {
+      "candidate": "eval_has_content_assertions",
+      "superseded_by": "eval_file_exists_ratio",
+      "mechanism": "path_normalization",
+      "rationale": "eval_has_content_assertions checks contains:\"contains\" in <skill>/evals/objective_cases.yaml. eval_file_exists_ratio checks the same PLUS min_count:cases>=5. Strict subset after path normalization."
+    },
+    {
+      "candidate": "ultimate_test_created_unknown_skill",
+      "superseded_by": "v4_terminal_test_unfamiliar_domain",
+      "mechanism": "string_containment",
+      "rationale": "ultimate_test checks contains:\"合格\" and contains:\"独立评估\" in <skill>/evolve_history/v4/genesis.md. v4_terminal_test checks contains:\"**合格**: 是\" (stronger, since \"合格\" ⊆str \"**合格**: 是\") and contains:\"独立评估\" (identical). All weak assertions semantically covered."
+    }
+  ],
+  "human_review_notes": "Both candidates require human confirmation before P2 archival. The eval_has_content_assertions→eval_file_exists_ratio subsumption is clear. The ultimate_test→v4_terminal_test relationship is valid semantically but conceptually different (one is a generalized marker, one is version-specific); human should confirm intent before archiving."
+}

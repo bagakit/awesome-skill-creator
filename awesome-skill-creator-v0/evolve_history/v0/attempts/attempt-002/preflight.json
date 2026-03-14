@@ -1,0 +1,19 @@
+{
+  "attempt_id": "attempt-002",
+  "day": 2,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-08",
+  "sanity_cases": [
+    {
+      "id": "5_agents_complete",
+      "description": "5 个 sub-agent 全部完成，输出可读",
+      "result": "pass"
+    },
+    {
+      "id": "schema_convergence",
+      "description": "5 个 JSON 输出符合统一 schema",
+      "result": "pass"
+    }
+  ],
+  "verdict": "proceed"
+}

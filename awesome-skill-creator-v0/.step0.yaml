@@ -1,0 +1,35 @@
+skill_name: awesome-skill-creator-v0
+created_at: 2026-03-14
+success_definition: "可验证、可自演化的 domain skill：process.md 反映领域专家思维、eval cases 区分好坏输出（含 judge_calibration）、有明确的进化路径和 evolve_history 证据链"
+failure_modes:
+  - id: A
+    description: "eval 只测结构不测功能——所有 case 通过但输出垃圾"
+    eval_detection: "run_script 断言在真实 fixture 上执行并检查功能输出"
+  - id: B
+    description: "judge_prompt 过严/过宽——LLM-as-judge 产生系统偏差"
+    eval_detection: "judge_calibration 断言双向校验：good_example→PASS, bad_example→FAIL"
+  - id: C
+    description: "进化不可解释——改了什么、为什么改不清楚"
+    eval_detection: "genesis.md 包含设计假设、被否决方案、研究影响矩阵"
+  - id: D
+    description: "目标与 eval 脱节——eval 通过但不解决领域问题"
+    eval_detection: ".step0.yaml success_definition 含领域词汇，assertions 回溯失败模式"
+  - id: E
+    description: "only-increase 约束空间爆炸——历史 legacy case 阻碍架构重构"
+    eval_detection: "P0/P1/P2 分级：P2 case 归档而非删除，run_eval.sh 默认过滤"
+domain_vocab:
+  - eval
+  - judge_calibration
+  - only-increase
+  - run_script
+  - invoke_skill_judge
+  - assert
+  - scaffold
+  - evolve_history
+  - genesis
+  - preflight
+  - bootstrap
+  - target_point
+  - failure_mode
+  - process
+  - fixture

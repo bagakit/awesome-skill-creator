@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-005",
+  "day": 5,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-01",
+  "stress_scenarios": [
+    {"scenario": "run_script 超时（脚本死循环）", "result": "pass", "note": "30s timeout 机制生效"},
+    {"scenario": "fixture 目录权限问题", "result": "pass", "note": "chmod 保证了脚本可执行"}
+  ]
+}

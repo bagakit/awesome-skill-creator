@@ -1,0 +1,24 @@
+{
+  "attempt_id": "attempt-001",
+  "timestamp": "2026-03-14",
+  "execution_status": "actual",
+  "day": 1,
+  "description": "Genesis validation — confirm all 7-generation capabilities are natively present",
+  "sanity_cases_run": ["create_valid_skill_md", "create_complete_directory", "step0_yaml_required"],
+  "results": {
+    "create_valid_skill_md": {
+      "passed": true,
+      "evidence": "SKILL.md exists with name: awesome-skill-creator and description containing domain vocab (judge_calibration, run_script, invoke_skill_judge, P0/P1/P2)"
+    },
+    "create_complete_directory": {
+      "passed": true,
+      "evidence": "All required files and directories created: SKILL.md, process.md, scaffold.md, manifest.yaml, evals/, tools/gate/, tools/scripts/, evolve_history/, locks/"
+    },
+    "step0_yaml_required": {
+      "passed": true,
+      "evidence": ".step0.yaml exists with 15 domain_vocab items, 5 failure_modes (A-E), and non-generic success_definition containing 'eval', 'judge_calibration', 'evolve_history'"
+    }
+  },
+  "verdict": "proceed",
+  "abort_reason": null
+}

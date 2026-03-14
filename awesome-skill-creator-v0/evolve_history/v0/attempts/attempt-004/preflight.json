@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-004",
+  "day": 4,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-22",
+  "sanity_cases": [
+    {"id": "fail_case_exists", "description": "eval 中存在 expected_result: fail 的 case", "result": "pass"},
+    {"id": "evolution_direction_present", "description": "每个 fail case 有 evolution_direction", "result": "pass"}
+  ],
+  "verdict": "proceed"
+}

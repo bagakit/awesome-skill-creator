@@ -1,0 +1,24 @@
+{
+  "attempt_id": "attempt-001",
+  "timestamp": "2026-03-14",
+  "execution_status": "actual",
+  "status": "partial",
+  "stress_scenarios": [
+    {
+      "scenario": "validate.sh run from wrong directory (. instead of awesome-skill-creator-v0)",
+      "result": "fail",
+      "evidence": "6 failures: directory name '.', step0.yaml mismatch, article path resolution errors",
+      "resolution": "Must run: bash awesome-skill-creator-v0/tools/gate/validate.sh awesome-skill-creator-v0 --ship"
+    },
+    {
+      "scenario": "validate.sh run from correct parent directory",
+      "result": "pass",
+      "evidence": "830 passed, 0 failed"
+    },
+    {
+      "scenario": "gen_skill_dir.sh test-probe v0 .tmp/",
+      "result": "pass",
+      "evidence": "Skeleton created successfully, validate_structure passes on generated dir"
+    }
+  ]
+}

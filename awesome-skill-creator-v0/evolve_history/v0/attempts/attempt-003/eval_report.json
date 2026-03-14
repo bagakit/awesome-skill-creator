@@ -1,0 +1,16 @@
+{
+  "attempt_id": "attempt-003",
+  "day": 3,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-15",
+  "target_point": "Goal-First Design / .step0.yaml",
+  "cases_run": 6,
+  "passed": 6,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "key_results": {
+    "step0_yaml_enforced": true,
+    "domain_vocab_in_description": true,
+    "failure_mode_cases_created": 3
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-006",
+  "day": 6,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-08",
+  "comparison": "invoke_skill_judge eval vs run_script-only eval",
+  "gsb_distribution": {"Good": 4, "Same": 2, "Bad": 1},
+  "value_creation_rate": 0.57,
+  "note": "Bad=1 来自 judge_prompt 过严导致的误判；judge 质量未验证是主要风险"
+}

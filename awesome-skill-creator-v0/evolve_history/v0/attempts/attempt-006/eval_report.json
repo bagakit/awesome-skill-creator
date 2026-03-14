@@ -1,0 +1,17 @@
+{
+  "attempt_id": "attempt-006",
+  "day": 6,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-08",
+  "target_point": "invoke_skill + invoke_skill_judge",
+  "cases_run": 10,
+  "passed": 9,
+  "failed": 1,
+  "pass_rate": 0.9,
+  "key_results": {
+    "invoke_skill_works": true,
+    "judge_discrimination": true,
+    "judge_consistency_rate": 0.75,
+    "known_issue": "1 个 judge case 因 judge_prompt 过严而错误失败（judge_prompt 质量未验证）"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-03-14",
+  "skill_domain": "skill creation workflows, domain expert simulation, self-bootstrapping",
+  "agent_type": "user-scenarios",
+  "findings": [
+    {
+      "title": "Human-AI Collaboration in Knowledge Work: Workflow Patterns",
+      "source": "https://dl.acm.org/doi/10.1145/3544548.3581503",
+      "year": "2023",
+      "key_finding": "Effective human-AI workflows require clear handoff points; AI should handle repetitive structured tasks while humans validate and steer; structured output enables human review",
+      "design_impact": "process.md 的「等待用户确认」节点（Step 1 后、Step 7 后）：结构化交接点设计"
+    },
+    {
+      "title": "Prompt Engineering for Structured Output Generation",
+      "source": "https://arxiv.org/abs/2308.00175",
+      "year": "2023",
+      "key_finding": "Domain-specific prompts with examples outperform generic prompts; few-shot examples in YAML/JSON format significantly improve structured output quality",
+      "design_impact": "process.md Step 2 的 JSON schema 强制：结构化 sub-agent 产出防止质量退化"
+    },
+    {
+      "title": "Self-Refine: Iterative Refinement with Self-Feedback",
+      "source": "https://arxiv.org/abs/2303.17651",
+      "year": "2023",
+      "key_finding": "LLMs can iteratively improve their outputs using self-generated feedback; each refinement cycle needs a clear stopping criterion to avoid infinite loops",
+      "design_impact": "self-bootstrap.md 的 Phase 1-7 闭环：每轮自举有明确的 fail→pass 证据要求和终止条件"
+    }
+  ],
+  "top_insights": [
+    "用户最常见的失望点：创建的 skill 内容「通用」，无法体现领域专业性",
+    "自举闭环的最大风险：eval 由 skill-creator 自己设计，存在自我参照偏差，终极检验是唯一外部锚点",
+    "结构化确认点（Step 1 后的需求确认、Step 7 后的验收确认）是用户信任的关键"
+  ],
+  "suggested_eval_cases": [
+    {
+      "description": "创建的 skill 的 process.md 包含领域特异性步骤（非通用流程模板）",
+      "source_title": "Human-AI Collaboration in Knowledge Work: Workflow Patterns",
+      "dimension": "coverage",
+      "expected_result": "pass"
+    },
+    {
+      "description": "self-bootstrap.md 包含 Phase 1-7 所有阶段",
+      "source_title": "Self-Refine: Iterative Refinement with Self-Feedback",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    }
+  ]
+}

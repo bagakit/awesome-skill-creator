@@ -1,0 +1,11 @@
+{
+  "attempt_id": "attempt-005",
+  "day": 5,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-01",
+  "verdict": "pass",
+  "target_point": "run_script 可执行断言",
+  "outcome": "run_script 断言消除了纯 contains 的功能盲区；.tmp/ 隔离机制防止 fixture 污染",
+  "key_finding": "「eval 只测结构」是可执行断言要解决的根本问题（Failure Mode A）",
+  "next_hypothesis": "Day 6: LLM-as-judge（invoke_skill_judge）能否评估无法用脚本衡量的主观质量维度？"
+}

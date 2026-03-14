@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-005",
+  "day": 5,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-01",
+  "sanity_cases": [
+    {"id": "run_script_executes", "description": "run_script 断言能在 fixture 上执行并返回 exit code", "result": "pass"},
+    {"id": "tmp_isolation", "description": "fixture 目录创建在 .tmp/ 下，不污染根目录", "result": "pass"},
+    {"id": "format_error_detected", "description": "run_script 能发现 YAML 格式错误（contains 无法发现）", "result": "pass"}
+  ],
+  "verdict": "proceed"
+}

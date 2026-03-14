@@ -1,0 +1,23 @@
+{
+  "attempt_id": "attempt-007",
+  "day": 7,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-15",
+  "stress_scenarios": [
+    {
+      "scenario": "judge_calibration 的 good_example 和 bad_example 差异极小",
+      "result": "pass",
+      "note": "judge_calibration 仍然检测出了细微的判别力差异"
+    },
+    {
+      "scenario": "P2 归档后，--all-tiers 能否完整回放历史 case",
+      "result": "pass",
+      "note": "superseded_by 指向链完整，历史判定可追溯"
+    },
+    {
+      "scenario": "judge_calibration 嵌套 session 跳过后的降级处理",
+      "result": "pass",
+      "note": "跳过时记录 execution_status: skipped，不视为通过"
+    }
+  ]
+}

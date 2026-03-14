@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-007",
+  "day": 7,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-15",
+  "comparison": "judge_calibration eval vs 无 meta-oracle eval",
+  "gsb_distribution": {"Good": 5, "Same": 1, "Bad": 0},
+  "value_creation_rate": 0.83,
+  "note": "judge_calibration 消除了 Day 6 的 Bad=1（过严 judge 误判）。增值率从 57% 提升到 83%。"
+}

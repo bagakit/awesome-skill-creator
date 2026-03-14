@@ -1,0 +1,24 @@
+{
+  "attempt_id": "attempt-008",
+  "date": "2026-03-15",
+  "execution_status": "executed",
+  "verdict": "pass",
+  "target_point": "P2 智能归档推荐 — suggest_p2_candidates.sh 改进",
+  "acceptance_criterion": "suggest_p2_candidates.sh 在 v0 eval suite 上输出至少 2 条合理归档建议",
+  "criterion_met": true,
+  "actual_candidates": 2,
+  "key_findings": [
+    "根因：精确字符串匹配无法发现跨 skill 名的结构性等价关系",
+    "修复 1：路径归一化（<skill-name>-v0/ → <skill>/）解锁 eval_has_content_assertions ⊆ eval_file_exists_ratio",
+    "修复 2：字符串包含语义（contains:X 被 contains:Y 包含当 X⊆str Y）解锁 ultimate_test ⊆ v4_terminal_test",
+    "新增 --json 模式支持机器可读输出，便于未来自动化集成",
+    "全部回归检查 753 passed, 0 failed"
+  ],
+  "validate_before": "705 passed, 0 failed",
+  "validate_after": "753 passed, 0 failed",
+  "regressions": "none",
+  "new_eval_cases": 5,
+  "new_ref_cards": 1,
+  "article_updated": true,
+  "next_steps": "Direction 1（Step-Level Judge）是 v1 的下一个优化点，复杂度最高，建议先做 POC 确认 process.md 步骤输出格式可行性后再开始 attempt-009"
+}

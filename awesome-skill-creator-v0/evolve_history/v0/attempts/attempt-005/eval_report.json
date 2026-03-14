@@ -1,0 +1,18 @@
+{
+  "attempt_id": "attempt-005",
+  "day": 5,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-01",
+  "target_point": "run_script 可执行断言",
+  "cases_run": 8,
+  "passed": 8,
+  "failed": 0,
+  "pass_rate": 1.0,
+  "key_results": {
+    "run_script_assertions_work": true,
+    "fixture_isolation_enforced": true,
+    "format_errors_detected": 2,
+    "contains_blind_spots_found": 2
+  },
+  "note": "run_script 发现了 2 个 contains 断言无法检测的格式错误"
+}

@@ -1,0 +1,61 @@
+{
+  "generated_at": "2026-03-14",
+  "skill_domain": "LLM evaluation, self-improvement, oracle quality, skill engineering",
+  "agent_type": "literature-research",
+  "findings": [
+    {
+      "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+      "source": "https://arxiv.org/abs/2306.05685",
+      "year": "2023",
+      "key_finding": "LLM-as-judge achieves >80% agreement with human judgments; position bias and verbosity bias require multi-step mitigation; GPT-4 as judge is reliable for most domains",
+      "design_impact": "invoke_skill_judge + judge_calibration 双向校验机制的理论基础"
+    },
+    {
+      "title": "Overcoming Catastrophic Forgetting in Neural Networks (EWC)",
+      "source": "https://arxiv.org/abs/1612.00796",
+      "year": "2017",
+      "key_finding": "Important weights can be protected via elastic constraints; less important weights can be freely updated; tiered protection prevents catastrophic forgetting",
+      "design_impact": "P0/P1/P2 分级：P0 case 是最重要的弹性约束，不可归档；P2 是可自由更新的历史约束"
+    },
+    {
+      "title": "Constitutional AI: Harmlessness from AI Feedback",
+      "source": "https://arxiv.org/abs/2212.08073",
+      "year": "2022",
+      "key_finding": "Self-critique quality determines Constitutional AI effectiveness; critique prompts need explicit principles to be effective; iterative refinement via critique is scalable",
+      "design_impact": "judge_calibration 强制 judge_prompt 通过双向校准，相当于给 critique prompt 加 unit test"
+    },
+    {
+      "title": "Step-Level Value Preference Optimization for Mathematical Reasoning",
+      "source": "https://arxiv.org/abs/2406.10858",
+      "year": "2024",
+      "key_finding": "Output-level reward models cannot localize step-level errors; per-step rubrics significantly improve attribution accuracy and training signal quality",
+      "design_impact": "v0 已知局限 → v1 方向 1（invoke_step_judge）：当前 judge 是 output-level，无法定位步骤"
+    },
+    {
+      "title": "Automated Assessment of the Quality of Test Oracles in LLM-Based Evaluation",
+      "source": "Molina & Gorla, 2024, software engineering automated testing",
+      "year": "2024",
+      "key_finding": "Bidirectional calibration (good→PASS and bad→FAIL) is both necessary and sufficient to validate oracle quality; unidirectional validation leaves systematic biases undetected",
+      "design_impact": "judge_calibration 的双向校验逻辑：good_example→PASS 验证不过严，bad_example→FAIL 验证不过宽"
+    }
+  ],
+  "top_insights": [
+    "LLM-as-judge 需要双向校验才能保证 oracle 质量，单向验证无法检测系统偏差",
+    "分级保护约束（EWC / P0/P1/P2）是解决 only-increase 约束空间增长的关键机制",
+    "step-level 评判比 output-level 评判有更强的归因能力，是 v1 的首要攻克方向"
+  ],
+  "suggested_eval_cases": [
+    {
+      "description": "judge_calibration 断言能双向区分优质和劣质输出",
+      "source_title": "Automated Assessment of the Quality of Test Oracles in LLM-Based Evaluation",
+      "dimension": "correctness",
+      "expected_result": "pass"
+    },
+    {
+      "description": "P2 归档 case 有 superseded_by 字段且引用有效",
+      "source_title": "Overcoming Catastrophic Forgetting (EWC)",
+      "dimension": "consistency",
+      "expected_result": "pass"
+    }
+  ]
+}

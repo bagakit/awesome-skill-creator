@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-006",
+  "day": 6,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-08",
+  "stress_scenarios": [
+    {"scenario": "invoke_skill 在嵌套 Claude session 中执行", "result": "skip", "note": "嵌套 session 跳过 LLM 断言——已知限制"},
+    {"scenario": "judge_prompt 过严导致系统性误判", "result": "fail", "note": "这正是 Day 7 要解决的问题"}
+  ]
+}

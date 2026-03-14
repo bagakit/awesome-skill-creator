@@ -1,0 +1,5 @@
+# .skillignore — files excluded from distribution packages (gen_dist.sh respects this)
+#
+# [build] tier: never distributed
+evolve_history/
+.tmp/

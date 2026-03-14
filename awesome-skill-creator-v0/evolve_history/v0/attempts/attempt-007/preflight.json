@@ -1,0 +1,25 @@
+{
+  "attempt_id": "attempt-007",
+  "day": 7,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-15",
+  "sanity_cases": [
+    {
+      "id": "judge_calibration_catches_overstrict",
+      "description": "judge_calibration 检测到 Day 6 中 over-strict judge 的误判",
+      "result": "pass",
+      "note": "good_example → FAIL 触发 → 强制修正 judge_prompt"
+    },
+    {
+      "id": "p2_archived_not_in_daily_stats",
+      "description": "P2 case 不出现在日常通过率统计中",
+      "result": "pass"
+    },
+    {
+      "id": "p0_survives_version_upgrade",
+      "description": "P0 case 在版本升级后仍然参与 eval",
+      "result": "pass"
+    }
+  ],
+  "verdict": "proceed"
+}

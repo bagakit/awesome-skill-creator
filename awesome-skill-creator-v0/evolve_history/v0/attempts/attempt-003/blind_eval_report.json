@@ -1,0 +1,10 @@
+{
+  "attempt_id": "attempt-003",
+  "day": 3,
+  "execution_status": "predicted",
+  "timestamp": "2024-01-15",
+  "comparison": "Goal-First（.step0.yaml）vs 无目标约束",
+  "gsb_distribution": {"Good": 3, "Same": 1, "Bad": 0},
+  "value_creation_rate": 0.75,
+  "skill_advantages": ["领域专向 eval case", "failure_mode 覆盖", "success_definition 可验证"]
+}

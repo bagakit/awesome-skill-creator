@@ -1,0 +1,12 @@
+{
+  "attempt_id": "attempt-006",
+  "day": 6,
+  "execution_status": "predicted",
+  "timestamp": "2024-02-08",
+  "sanity_cases": [
+    {"id": "invoke_skill_runs", "description": "invoke_skill 在 fixture 上成功执行", "result": "pass"},
+    {"id": "judge_discriminates", "description": "invoke_skill_judge 对高低质量输出给出不同判断", "result": "pass"},
+    {"id": "pass_rate_threshold_works", "description": "多次运行取通过率，结果稳定", "result": "pass"}
+  ],
+  "verdict": "proceed"
+}

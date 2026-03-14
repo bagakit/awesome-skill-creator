@@ -1,0 +1,26 @@
+{
+  "attempt_id": "attempt-008",
+  "date": "2026-03-15",
+  "execution_status": "executed",
+  "target_point": "P2 智能归档推荐 — suggest_p2_candidates.sh 改进",
+  "preflight_cases": [
+    {
+      "case_id": "suggest_p2_finds_min_two_candidates",
+      "status": "pass",
+      "output": "PASS: suggest_p2_candidates.sh found 2 candidates (≥2)"
+    },
+    {
+      "case_id": "suggest_p2_path_normalization",
+      "status": "pass",
+      "output": "PASS: path normalization correctly detects cross-skill subsumption"
+    },
+    {
+      "case_id": "suggest_p2_string_containment",
+      "status": "pass",
+      "output": "PASS: string-containment subsumption correctly detected"
+    }
+  ],
+  "conclusion": "Preflight passed: 3/3 sanity cases pass. Core hypothesis (path normalization + string containment finds ≥2 P2 candidates) confirmed. Proceeding to full eval.",
+  "command": "bash tools/scripts/suggest_p2_candidates.sh evals/",
+  "actual_output": "P2 candidates: 2 case(s) found (human review required before archiving)\n\n  CANDIDATE: eval_has_content_assertions  (2 token(s))\n    → superseded_by: eval_file_exists_ratio  (5 token(s), covers all of the above)\n\n  CANDIDATE: ultimate_test_created_unknown_skill  (3 token(s))\n    → superseded_by: v4_terminal_test_unfamiliar_domain  (3 token(s), covers all of the above)"
+}
